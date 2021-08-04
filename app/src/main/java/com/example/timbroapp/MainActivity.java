@@ -31,9 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
         Info.setText("No of attempts remaining: 5");
 
-        Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
-        startActivity(intent);
-
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

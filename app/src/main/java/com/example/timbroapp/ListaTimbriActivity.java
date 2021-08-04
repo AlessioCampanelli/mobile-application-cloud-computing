@@ -10,8 +10,16 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.fragment.app.Fragment;
 
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.view.View;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+
+import java.util.ArrayList;
 
 public class ListaTimbriActivity extends AppCompatActivity {
 
@@ -26,6 +34,7 @@ public class ListaTimbriActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(navListener);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+
     }
 
     private NavigationBarView.OnItemSelectedListener navListener =
@@ -41,8 +50,8 @@ public class ListaTimbriActivity extends AppCompatActivity {
                         case R.id.profile:
                             selectedFragment = new ProfileFragment();
                             break;
-                        case R.id.settings:
-                            selectedFragment = new SettingsFragment();
+                        case R.id.more:
+                            selectedFragment = new MoreFragment();
                             break;
                     }
 
