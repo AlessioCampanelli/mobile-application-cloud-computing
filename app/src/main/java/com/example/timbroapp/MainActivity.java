@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
         Info.setText("No of attempts remaining: 5");
 
+        Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
+        startActivity(intent);
+
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -41,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void validate(String userName, String userPassword) {
         if((userName.equals("Admin")) && (userPassword.equals("1234"))) {
-            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+            Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
             startActivity(intent);
         } else {
             counter --;
