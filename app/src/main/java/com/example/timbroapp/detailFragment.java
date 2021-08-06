@@ -6,21 +6,15 @@ import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
-
-import static android.widget.AdapterView.*;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link detailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class detailFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,7 +25,7 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public HomeFragment() {
+    public detailFragment() {
         // Required empty public constructor
     }
 
@@ -41,11 +35,11 @@ public class HomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
+     * @return A new instance of fragment detailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static detailFragment newInstance(String param1, String param2) {
+        detailFragment fragment = new detailFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -62,29 +56,19 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    ListView listView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        String[] items = {"Timbro 1", "Timbro 2", "Timbro 3"};
+        View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        listView = (ListView)view.findViewById(R.id.listview);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items);
-        listView.setAdapter(arrayAdapter);
-
-        // View Item Click
-        listView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                detailFragment detailFragment = new detailFragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt("item", i);
-                detailFragment.setArguments(bundle);
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
-            }
-        });
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            int myInt = bundle.getInt("item", 0);
+            myInt = myInt + 1;
+            TextView detailTextView = (TextView)view.findViewById(R.id.detailTextView);
+            detailTextView.setText("Timbro " + myInt);
+        }
 
         // Inflate the layout for this fragment
         return view;

@@ -9,7 +9,8 @@
         android:id="@+id/homeFragment"
         android:name="com.example.timbroapp.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+    </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.timbroapp.ProfileFragment"
@@ -17,7 +18,12 @@
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.timbroapp.SettingsFragment"
+        android:name="com.example.timbroapp.MoreFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_more" />
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.example.timbroapp.detailFragment"
+        android:label="fragment_detail"
+        tools:layout="@layout/fragment_detail" />
 </navigation>
