@@ -10,14 +10,20 @@ import android.widget.TextView;
 import android.widget.Button;
 
 import android.os.Bundle;
+import android.widget.Toast;
+
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText Name;
     private EditText Password;
-    private TextView Info;
     private Button Login;
-    private int counter = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         Name = (EditText)findViewById(R.id.etName);
         Password = (EditText)findViewById(R.id.etPassword);
-        Info = (TextView)findViewById(R.id.tvInfo);
         Login = (Button)findViewById(R.id.btnLogin);
-
-        Info.setText("No of attempts remaining: 5");
 
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,18 +42,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void validate(String userName, String userPassword) {
-        if((userName.equals("Admin")) && (userPassword.equals("1234"))) {
-            Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
-            startActivity(intent);
-        } else {
-            counter --;
+    private void validate(String username, String password) {
 
-            Info.setText("No of attempts remaining: " + String.valueOf(counter));
+        Call<ResponseBody> call = RetrofitClient.getInstance().getLoginService().login(username, password);
 
-            if(counter == 0) {
-                Login.setEnabled(false);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String s = response.body().string();
+                    Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
+                    // go to next activity
+                    Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
+                    startActivity(intent);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "Error in executing login", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 }
