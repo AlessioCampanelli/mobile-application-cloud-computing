@@ -1,5 +1,9 @@
 package com.example.timbroapp;
 
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -20,6 +26,8 @@ public class detailFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private int n_timbro;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -66,11 +74,45 @@ public class detailFragment extends Fragment {
         if (bundle != null) {
             int myInt = bundle.getInt("item", 0);
             myInt = myInt + 1;
-            TextView detailTextView = (TextView)view.findViewById(R.id.detailTextView);
-            detailTextView.setText("Timbro " + myInt);
+            n_timbro = myInt;
+            //TextView detailTextView = (TextView)view.findViewById(R.id.detailTextView);
+            //detailTextView.setText("Timbro " + myInt);
         }
+
+        FrameLayout frameLayout = (FrameLayout) view.findViewById(R.id.fragment_detail);
+        frameLayout.addView(new DrawView(getActivity()));
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    public class DrawView extends View {
+
+        public DrawView(Context context){
+            super(context);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            int x = getWidth();
+            int y = getHeight();
+            int radius;
+            radius = 50;
+            Paint paint = new Paint();
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.WHITE);
+            canvas.drawPaint(paint);
+            paint.setColor(Color.parseColor("#da4747"));
+
+            // draw circle
+            canvas.drawCircle(x - 60, 60, radius, paint);
+
+            // draw text
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(50);
+            canvas.drawText("Timbro " + n_timbro, 30, 60, paint);
+        }
     }
 }

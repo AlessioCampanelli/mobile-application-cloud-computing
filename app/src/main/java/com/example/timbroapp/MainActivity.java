@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText Password;
     private Button Login;
 
+    final LoadingDialog loadingDialog = new LoadingDialog(MainActivity.this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +39,10 @@ public class MainActivity extends AppCompatActivity {
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                validate(Name.getText().toString(), Password.getText().toString());
+                //loadingDialog.startLoadingDialog();
+                //validate(Name.getText().toString(), Password.getText().toString());
+                Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -50,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
+                    loadingDialog.dismissDialog();
                     String s = response.body().string();
                     Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
                     // go to next activity
