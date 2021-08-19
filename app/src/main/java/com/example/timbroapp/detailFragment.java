@@ -1,6 +1,7 @@
 package com.example.timbroapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,7 +12,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -21,6 +24,8 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class detailFragment extends Fragment {
+
+    private Button Timbro;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -70,6 +75,8 @@ public class detailFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
+        Timbro = (Button)view.findViewById(R.id.buttonTimbro);
+
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             int myInt = bundle.getInt("item", 0);
@@ -79,8 +86,15 @@ public class detailFragment extends Fragment {
             //detailTextView.setText("Timbro " + myInt);
         }
 
-        FrameLayout frameLayout = (FrameLayout) view.findViewById(R.id.fragment_detail);
-        frameLayout.addView(new DrawView(getActivity()));
+        FrameLayout layout = (FrameLayout) view.findViewById(R.id.fragment_detail);
+        layout.addView(new DrawView(getActivity()));
+
+        Timbro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.print("ciao");
+            }
+        });
 
         // Inflate the layout for this fragment
         return view;
