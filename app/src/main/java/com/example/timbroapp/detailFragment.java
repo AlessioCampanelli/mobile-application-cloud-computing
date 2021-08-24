@@ -1,22 +1,19 @@
 package com.example.timbroapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,7 +22,8 @@ import android.widget.TextView;
  */
 public class detailFragment extends Fragment {
 
-    private Button Timbro;
+    private Button TimbroCheckIn;
+    private Button TimbroCheckOut;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -75,7 +73,8 @@ public class detailFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        Timbro = (Button)view.findViewById(R.id.buttonTimbro);
+        TimbroCheckIn = (Button)view.findViewById(R.id.checkIn);
+        TimbroCheckOut= (Button)view.findViewById(R.id.checkOut);
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
@@ -86,13 +85,20 @@ public class detailFragment extends Fragment {
             //detailTextView.setText("Timbro " + myInt);
         }
 
-        FrameLayout layout = (FrameLayout) view.findViewById(R.id.fragment_detail);
+        ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.fragment_detail);
         layout.addView(new DrawView(getActivity()));
 
-        Timbro.setOnClickListener(new View.OnClickListener() {
+        TimbroCheckIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.print("ciao");
+                Toast.makeText(getContext(), "Timbratura Check-In effettuata con successo!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        TimbroCheckOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
             }
         });
 
