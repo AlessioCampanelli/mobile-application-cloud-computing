@@ -1,12 +1,10 @@
 package com.example.timbroapp;
 
-import android.content.Intent;
-
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Button;
 
 import android.os.Bundle;
@@ -18,6 +16,11 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import com.example.timbroapp.Result;
+
+import org.json.JSONObject;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,35 +42,40 @@ public class MainActivity extends AppCompatActivity {
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //loadingDialog.startLoadingDialog();
-                //validate(Name.getText().toString(), Password.getText().toString());
-                Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
-                startActivity(intent);
+                loadingDialog.startLoadingDialog();
+                validate(Name.getText().toString(), Password.getText().toString());
             }
         });
     }
 
     private void validate(String username, String password) {
 
-        Call<ResponseBody> call = RetrofitClient.getInstance().getLoginService().login(username, password);
+        Call<Result> call = RetrofitClient.getInstance().getLoginService().login(username, password);
 
-        call.enqueue(new Callback<ResponseBody>() {
+        call.enqueue(new Callback<Result>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    loadingDialog.dismissDialog();
-                    String s = response.body().string();
-                    Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
-                    // go to next activity
-                    Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
-                    startActivity(intent);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            public void onResponse(Call<Result> call, Response<Result> response) {
+                    if(response.isSuccessful()) {
+                        String access_token = response.body().getAccess_token();
+                        loadingDialog.dismissDialog();
+                        Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_LONG).show();
+                        // go to next activity
+                        Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
+                        startActivity(intent);
+                    } else {
+                        try {
+                            loadingDialog.dismissDialog();
+                            JSONObject jObjError = new JSONObject(response.errorBody().string());
+                            Toast.makeText(MainActivity.this, jObjError.getString("message"), Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<Result> call, Throwable t) {
+                    loadingDialog.dismissDialog();
                     Toast.makeText(MainActivity.this, "Error in executing login", Toast.LENGTH_LONG).show();
             }
         });

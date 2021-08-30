@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
 
-    private static final String BASE_URL = "";
+    private static final String BASE_URL = "https://maac-stampings.de/v1/api/";
     private static RetrofitClient mInstance;
     private Retrofit retrofit;
 

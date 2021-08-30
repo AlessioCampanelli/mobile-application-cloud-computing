@@ -1,6 +1,5 @@
 package com.example.timbroapp;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -10,7 +9,7 @@ public interface LoginService {
 
     @FormUrlEncoded
     @POST("login")
-    Call<ResponseBody> login (
+    Call<Result> login (
         @Field("username") String username,
         @Field("password") String password
     );

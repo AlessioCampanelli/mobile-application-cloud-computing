@@ -29,7 +29,7 @@ public class LoadingDialog {
         builder.setCancelable(false);
 
         dialog = builder.create();
-        //dialog.show();
+        dialog.show();
     }
 
     void dismissDialog() {
