@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.widget.AdapterView.*;
 
@@ -67,8 +68,14 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        List<Stamping> stampings = Singleton.getInstance().getStampings();
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        String[] items = {"Timbro 1", "Timbro 2", "Timbro 3"};
+        String[] items = new String[stampings.toArray().length];
+
+        for(int i=0; i<stampings.toArray().length; i++) {
+            items[i] = stampings.get(i).getTitle();
+        }
 
         listView = (ListView)view.findViewById(R.id.listview);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items);

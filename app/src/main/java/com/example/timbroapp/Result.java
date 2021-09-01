@@ -14,12 +14,18 @@ public class Result {
     @SerializedName("statusCode")
     @Expose
     private Integer statusCode;
+    @SerializedName("id_user")
+    @Expose
+    private String id_user;
     @SerializedName("message")
     @Expose
     private String message;
-    @SerializedName("access_token")
+    @SerializedName("jwt_token")
     @Expose
-    private String access_token;
+    private String jwt_token;
+    @SerializedName("firebase_token")
+    @Expose
+    private String firebase_token;
 
     public String getUsername() {
         return username;
@@ -45,6 +51,14 @@ public class Result {
         this.statusCode = statusCode;
     }
 
+    public String getId_user() {
+        return id_user;
+    }
+
+    public void setId_user(String id_user) {
+        this.id_user = id_user;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -53,12 +67,20 @@ public class Result {
         this.message = message;
     }
 
-    public String getAccess_token() {
-        return access_token;
+    public String getJwt_token() {
+        return jwt_token;
     }
 
-    public void setAccess_token(String access_token) {
-        this.access_token = access_token;
+    public void setJwt_token(String jwt_token) {
+        this.jwt_token = jwt_token;
+    }
+
+    public String getFirebase_token() {
+        return firebase_token;
+    }
+
+    public void setFirebase_token(String firebase_token) {
+        this.firebase_token = firebase_token;
     }
 
 }
