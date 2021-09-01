@@ -8,6 +8,8 @@ public class Singleton  {
 
     // other instance variables can be here
     private List<Stamping> stampings;
+    private String jwt_token;
+    private String firebase_token;
 
     private Singleton() {};
 
@@ -19,12 +21,14 @@ public class Singleton  {
     }
 
     // other instance methods can follow
-
     public List<Stamping> getStampings() {
         return this.stampings;
     }
-
     public void setStampings(List<Stamping> stampings) {
         this.stampings = stampings;
     }
+    public String getFirebase_token() { return this.firebase_token; }
+    public void setFirebase_token(String token) {this.firebase_token = token; }
+    public String getJwt_token_token() { return this.jwt_token; }
+    public void setJwt_token_token(String token) {this.jwt_token = token; }
 }

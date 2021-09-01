@@ -10,9 +10,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -32,6 +34,17 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.json.JSONObject;
+
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,8 +55,10 @@ public class detailFragment extends Fragment {
 
     private Button TimbroCheckIn;
     private Button TimbroCheckOut;
+    private List<Stamping> stampings;
 
     FusedLocationProviderClient fusedLocationProviderClient;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -87,6 +102,7 @@ public class detailFragment extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -95,11 +111,11 @@ public class detailFragment extends Fragment {
 
         TimbroCheckIn = (Button)view.findViewById(R.id.checkIn);
         TimbroCheckOut= (Button)view.findViewById(R.id.checkOut);
+        stampings = Singleton.getInstance().getStampings();
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             int myInt = bundle.getInt("item", 0);
-            myInt = myInt + 1;
             n_timbro = myInt;
             //TextView detailTextView = (TextView)view.findViewById(R.id.detailTextView);
             //detailTextView.setText("Timbro " + myInt);
@@ -113,7 +129,9 @@ public class detailFragment extends Fragment {
         TimbroCheckIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "Timbratura Check-In effettuata con successo!", Toast.LENGTH_LONG).show();
+
+                Stamping stmp = stampings.get(n_timbro);
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -168,7 +186,10 @@ public class detailFragment extends Fragment {
             // draw text
             paint.setColor(Color.BLACK);
             paint.setTextSize(50);
-            canvas.drawText("Timbro " + n_timbro, 30, 60, paint);
+            canvas.drawText("Title: " + stampings.get(n_timbro).getTitle(), 30, 60, paint);
+            canvas.drawText("Address: " + stampings.get(n_timbro).getAddress(), 30, 120, paint);
+            canvas.drawText("Start Time: " + stampings.get(n_timbro).getStartTime(), 30, 180, paint);
+            canvas.drawText("End Time: " + stampings.get(n_timbro).getEndTime(), 30, 240, paint);
         }
     }
 

@@ -61,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<Result> call_login, Response<Result> response) {
                     if(response.isSuccessful()) {
                         jwt_token = response.body().getJwt_token();
+                        Singleton.getInstance().setFirebase_token(jwt_token);
                         firebase_token = response.body().getFirebase_token();
+                        Singleton.getInstance().setFirebase_token(firebase_token);
                         id_user = response.body().getId_user();
                         loadingDialog.dismissDialog();
                         Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_LONG).show();
