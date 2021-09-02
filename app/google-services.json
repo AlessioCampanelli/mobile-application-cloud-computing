@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "603624493116",
+    "project_id": "maac-shifts",
+    "storage_bucket": "maac-shifts.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:603624493116:android:68d25f538494f22dc67339",
+        "android_client_info": {
+          "package_name": "com.example.timbroapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "603624493116-um4q510rcv80t7e06dksp8qi5df8poes.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPGPlTKKk7Bl-mdtFS3snxl85z4T1dQbs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "603624493116-um4q510rcv80t7e06dksp8qi5df8poes.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -34,6 +34,9 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONObject;
@@ -41,6 +44,7 @@ import org.json.JSONObject;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,7 +62,9 @@ public class detailFragment extends Fragment {
     private List<Stamping> stampings;
 
     FusedLocationProviderClient fusedLocationProviderClient;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private FirebaseAuth mAuth;
+    FirebaseFirestore db;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -123,6 +129,11 @@ public class detailFragment extends Fragment {
 
         ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.fragment_detail);
         layout.addView(new DrawView(getActivity()));
+
+        //firebaseAuth();
+
+        db = FirebaseFirestore.getInstance();
+
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -238,6 +249,36 @@ public class detailFragment extends Fragment {
             startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
+    }
+
+    private void firebaseAuth() {
+
+        // Initialize Firebase Auth
+        //mAuth = FirebaseAuth.getInstance();
+        // Check if user is signed in (non-null)
+        //FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        //String firebase_token = Singleton.getInstance().getFirebase_token();
+
+        /*mAuth.signInWithCustomToken(firebase_token)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            //Log.d(TAG, "signInWithCustomToken:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            //db = FirebaseFirestore.getInstance();
+                            //updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                           // Log.w(TAG, "signInWithCustomToken:failure", task.getException());
+                            Toast.makeText(getContext(), "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            //updateUI(null);
+                        }
+                    }
+                });*/
     }
 
 }
