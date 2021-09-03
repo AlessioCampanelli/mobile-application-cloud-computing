@@ -15,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -92,10 +91,11 @@ public class HomeFragment extends Fragment {
             listView.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    detailFragment detailFragment = new detailFragment();
+                    DetailFragment detailFragment = new DetailFragment();
                     Bundle bundle = new Bundle();
                     bundle.putInt("item", i);
                     detailFragment.setArguments(bundle);
+                    detailFragment.model = model;
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
                 }
             });

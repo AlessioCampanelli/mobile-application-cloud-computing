@@ -13,7 +13,7 @@ public class Stamping {
     private String startStampedTime;
     @SerializedName("end_stamped_time")
     @Expose
-    private Object endStampedTime;
+    private String endStampedTime;
     @SerializedName("subtitle")
     @Expose
     private String subtitle;
@@ -49,11 +49,11 @@ public class Stamping {
         this.startStampedTime = startStampedTime;
     }
 
-    public Object getEndStampedTime() {
+    public String getEndStampedTime() {
         return endStampedTime;
     }
 
-    public void setEndStampedTime(Object endStampedTime) {
+    public void setEndStampedTime(String endStampedTime) {
         this.endStampedTime = endStampedTime;
     }
 

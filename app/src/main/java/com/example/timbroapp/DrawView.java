@@ -24,7 +24,7 @@ public class DrawView extends View {
         radius = 50;
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-        //paint.setColor(Color.RED);
+        paint.setColor(Color.WHITE);
         canvas.drawPaint(paint);
         paint.setColor(Color.parseColor("#da4747"));
 

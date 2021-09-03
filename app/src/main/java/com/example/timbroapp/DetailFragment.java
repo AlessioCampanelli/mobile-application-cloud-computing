@@ -5,30 +5,25 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Looper;
 import android.provider.Settings;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,32 +41,36 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.json.JSONObject;
-
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executor;
-
-import kotlinx.coroutines.Dispatchers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.content.ContentValues.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link detailFragment#newInstance} factory method to
+ * Use the {@link DetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class detailFragment extends Fragment {
+public class DetailFragment extends Fragment {
 
-    private Button TimbroCheckIn;
-    private Button TimbroCheckOut;
-    private Button DownloadPDF;
     private List<Stamping> stampings;
+
+    public TimbriViewModel model;
+
+    private Button timbroCheckIn;
+    private Button timbroCheckOut;
+    private Button downloadPDF;
+
+    private TextView titleView;
+    private TextView addressView;
+    private TextView startTimeView;
+    private TextView endTimeView;
+    private TextView startStampedTimeView;
+    private TextView endStampedTimeView;
+
+    private LoadingDialog loadingDialog = new LoadingDialog(getActivity());
 
     FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -89,7 +88,7 @@ public class detailFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public detailFragment() {
+    public DetailFragment() {
         // Required empty public constructor
     }
 
@@ -102,8 +101,8 @@ public class detailFragment extends Fragment {
      * @return A new instance of fragment detailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static detailFragment newInstance(String param1, String param2) {
-        detailFragment fragment = new detailFragment();
+    public static DetailFragment newInstance(String param1, String param2) {
+        DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -149,34 +148,67 @@ public class detailFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        TimbroCheckIn = (Button)view.findViewById(R.id.checkIn);
-        TimbroCheckOut= (Button)view.findViewById(R.id.checkOut);
-        DownloadPDF = (Button)view.findViewById(R.id.buttonDownload);
         stampings = Singleton.getInstance().getStampings();
+
+        timbroCheckIn = (Button)view.findViewById(R.id.checkIn);
+        timbroCheckOut = (Button)view.findViewById(R.id.checkOut);
+        downloadPDF = (Button)view.findViewById(R.id.buttonDownload);
+
+        titleView = (TextView) view.findViewById(R.id.textviewTitle);
+        addressView = (TextView) view.findViewById(R.id.textviewAddress);
+        startTimeView = (TextView) view.findViewById(R.id.textviewStartTime);
+        endTimeView = (TextView) view.findViewById(R.id.textviewEndTime);
+        startStampedTimeView = (TextView) view.findViewById(R.id.textviewStartStampedTime);
+        endStampedTimeView = (TextView) view.findViewById(R.id.textviewEndStampedTime);
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             int myInt = bundle.getInt("item", 0);
             n_timbro = myInt;
-            //TextView detailTextView = (TextView)view.findViewById(R.id.detailTextView);
-            //detailTextView.setText("Timbro " + myInt);
         }
 
         ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.fragment_detail);
-        //layout.addView(new DrawView(getActivity()));
-
 
         firebaseAuth();
-        Stamping stmp = stampings.get(n_timbro);
+        Stamping currentStamping = stampings.get(n_timbro);
+
+        titleView.setText(currentStamping.getTitle());
+        addressView.setText(currentStamping.getAddress());
+
+
+        Date startTimeDate = new Date(Long.parseLong(currentStamping.getStartTime()));
+        Date endTimeDate = new Date(Long.parseLong(currentStamping.getEndTime()));
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+        String startTimeFormattedDate = formatter.format(startTimeDate);
+        String endTimeFormattedDate = formatter.format(endTimeDate);
+
+        if (currentStamping.getStartStampedTime() != null) {
+            Date startStampedDate = new Date(Long.parseLong(currentStamping.getStartStampedTime()));
+            String startStampedFormattedDate = formatter.format(startStampedDate);
+            startStampedTimeView.setText(startStampedFormattedDate);
+        }
+
+        if (currentStamping.getEndStampedTime() != null) {
+            Date endStampedDate = new Date(Long.parseLong(currentStamping.getEndStampedTime()));
+            String endStampedFormattedDate = formatter.format(endStampedDate);
+            endStampedTimeView.setText(endStampedFormattedDate);
+        }
+
+        startTimeView.setText(startTimeFormattedDate);
+        endTimeView.setText(endTimeFormattedDate);
+
         db = FirebaseFirestore.getInstance();
-        DocumentReference doc_ref = db.collection("stampings").document(stmp.getIdDoc());
+        DocumentReference doc_ref = db.collection("stampings").document(currentStamping.getIdDoc());
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
-        TimbroCheckIn.setOnClickListener(new View.OnClickListener() {
+        timbroCheckIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                loadingDialog = new LoadingDialog(getActivity());
+                loadingDialog.startLoadingDialog();
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
                 doc_ref
@@ -184,12 +216,16 @@ public class detailFragment extends Fragment {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                loadingDialog.dismissDialog();
+                                Log.d(TAG, "Timbratura Check-In effettuata con successo!");
+                                Toast.makeText(getContext(), "Timbratura Check-In effettuata con successo!", Toast.LENGTH_LONG).show();
+                                model.loadStampings(Singleton.getInstance().getId_user());
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                loadingDialog.dismissDialog();
                                 Log.w(TAG, "Error updating document", e);
                             }
                         });
@@ -203,27 +239,29 @@ public class detailFragment extends Fragment {
             }
         });
 
-        TimbroCheckOut.setOnClickListener(new View.OnClickListener() {
+        timbroCheckOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
-
-               /* Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
+                loadingDialog = new LoadingDialog(getActivity());
+                loadingDialog.startLoadingDialog();
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 doc_ref
                         .update("end_stamped_time", timestamp)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
+                                loadingDialog.dismissDialog();
                                 Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                loadingDialog.dismissDialog();
                                 Log.w(TAG, "Error updating document", e);
                             }
-                        });*/
+                        });
 
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -234,7 +272,7 @@ public class detailFragment extends Fragment {
             }
         });
 
-        DownloadPDF.setOnClickListener(new View.OnClickListener() {
+        downloadPDF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 downloadPDF();

@@ -23,7 +23,7 @@
         tools:layout="@layout/fragment_more" />
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.example.timbroapp.detailFragment"
+        android:name="com.example.timbroapp.DetailFragment"
         android:label="fragment_detail"
         tools:layout="@layout/fragment_detail" />
 </navigation>
