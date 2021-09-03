@@ -61,40 +61,19 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<Result> call_login, Response<Result> response) {
                     if(response.isSuccessful()) {
                         jwt_token = response.body().getJwt_token();
-                        Singleton.getInstance().setFirebase_token(jwt_token);
+                        Singleton.getInstance().setJwt_token(jwt_token);
                         firebase_token = response.body().getFirebase_token();
                         Singleton.getInstance().setFirebase_token(firebase_token);
                         id_user = response.body().getId_user();
+                        Singleton.getInstance().setId_user(id_user);
                         loadingDialog.dismissDialog();
                         Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_LONG).show();
 
-                        Call<ResultStampings> call_stampings = RetrofitClient.getInstance().getLoginService().list_stampings(id_user, "Bearer "+jwt_token);
+                        //Call<ResultStampings> call_stampings = RetrofitClient.getInstance().getLoginService().list_stampings(id_user, "Bearer "+jwt_token);
 
-                        // call list stampings
-                        call_stampings.enqueue(new Callback<ResultStampings>() {
-                            @Override
-                            public void onResponse(Call<ResultStampings> call, Response<ResultStampings> response) {
-                                if(response.isSuccessful()) {
-                                    Singleton.getInstance().setStampings(response.body().getStampings());
-                                    // go to next activity
-                                    Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
-                                    startActivity(intent);
-                                } else {
-                                    try {
-                                        loadingDialog.dismissDialog();
-                                        JSONObject jObjError = new JSONObject(response.errorBody().string());
-                                        Toast.makeText(MainActivity.this, jObjError.getString("message"), Toast.LENGTH_LONG).show();
-                                    } catch (Exception e) {
-                                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<ResultStampings> call, Throwable t) {
-                                Toast.makeText(MainActivity.this, "Error in retrieving list of stampings", Toast.LENGTH_LONG).show();
-                            }
-                        });
+                        // go to next activity
+                        Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
+                        startActivity(intent);
                     } else {
                         try {
                             loadingDialog.dismissDialog();

@@ -14,13 +14,17 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,22 +37,29 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import kotlinx.coroutines.Dispatchers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,6 +70,7 @@ public class detailFragment extends Fragment {
 
     private Button TimbroCheckIn;
     private Button TimbroCheckOut;
+    private Button DownloadPDF;
     private List<Stamping> stampings;
 
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -108,6 +120,28 @@ public class detailFragment extends Fragment {
         }
     }
 
+    /*@Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        Stamping stmp = stampings.get(n_timbro);
+
+        TimbriViewModel model = new ViewModelProvider(this).get(TimbriViewModel.class);
+
+        model.stampings.observe(getViewLifecycleOwner(), stampings -> {
+            // update UI
+            Log.d(TAG, "Stampings retrieved correctly!");
+        });
+
+        model.onError.observe(getViewLifecycleOwner(), stampings -> {
+            // update UI
+            Log.d(TAG, "Error on retrieving stampings");
+        });
+
+        model.loadStampings(stmp.getIdUser());
+
+    }*/
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -117,6 +151,7 @@ public class detailFragment extends Fragment {
 
         TimbroCheckIn = (Button)view.findViewById(R.id.checkIn);
         TimbroCheckOut= (Button)view.findViewById(R.id.checkOut);
+        DownloadPDF = (Button)view.findViewById(R.id.buttonDownload);
         stampings = Singleton.getInstance().getStampings();
 
         Bundle bundle = this.getArguments();
@@ -128,12 +163,13 @@ public class detailFragment extends Fragment {
         }
 
         ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.fragment_detail);
-        layout.addView(new DrawView(getActivity()));
+        //layout.addView(new DrawView(getActivity()));
 
-        //firebaseAuth();
 
+        firebaseAuth();
+        Stamping stmp = stampings.get(n_timbro);
         db = FirebaseFirestore.getInstance();
-
+        DocumentReference doc_ref = db.collection("stampings").document(stmp.getIdDoc());
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -141,8 +177,22 @@ public class detailFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                Stamping stmp = stampings.get(n_timbro);
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+                doc_ref
+                        .update("start_stamped_time", timestamp)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "DocumentSnapshot successfully updated!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error updating document", e);
+                            }
+                        });
 
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -158,6 +208,23 @@ public class detailFragment extends Fragment {
             public void onClick(View view) {
                 Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
 
+               /* Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+                doc_ref
+                        .update("end_stamped_time", timestamp)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "DocumentSnapshot successfully updated!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error updating document", e);
+                            }
+                        });*/
+
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     getCurrentLocation();
@@ -167,41 +234,35 @@ public class detailFragment extends Fragment {
             }
         });
 
+        DownloadPDF.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloadPDF();
+            }
+
+            public void downloadPDF() {
+                /*viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        val devices = deviceRepo.meshDevicesSync
+
+                        val maxDevices = deviceRepo.getMaxDevicesForPlant(ignoreDeviceType = true)
+                        val app = getApplication<Application>()
+
+                        if(devices.size >= maxDevices){
+                            errorMessage.postValue(app.getString(R.string.error_max_devices_reached))
+                            return@launch
+                        }
+
+                        isDeviceToAdd.postValue(true)
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                    }
+                }*/
+            }
+        });
+
         // Inflate the layout for this fragment
         return view;
-    }
-
-    public class DrawView extends View {
-
-        public DrawView(Context context){
-            super(context);
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-
-            int x = getWidth();
-            int y = getHeight();
-            int radius;
-            radius = 50;
-            Paint paint = new Paint();
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(Color.WHITE);
-            canvas.drawPaint(paint);
-            paint.setColor(Color.parseColor("#da4747"));
-
-            // draw circle
-            canvas.drawCircle(x - 60, 60, radius, paint);
-
-            // draw text
-            paint.setColor(Color.BLACK);
-            paint.setTextSize(50);
-            canvas.drawText("Title: " + stampings.get(n_timbro).getTitle(), 30, 60, paint);
-            canvas.drawText("Address: " + stampings.get(n_timbro).getAddress(), 30, 120, paint);
-            canvas.drawText("Start Time: " + stampings.get(n_timbro).getStartTime(), 30, 180, paint);
-            canvas.drawText("End Time: " + stampings.get(n_timbro).getEndTime(), 30, 240, paint);
-        }
     }
 
     @Override
@@ -254,13 +315,14 @@ public class detailFragment extends Fragment {
     private void firebaseAuth() {
 
         // Initialize Firebase Auth
-        //mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         // Check if user is signed in (non-null)
-        //FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        //String firebase_token = Singleton.getInstance().getFirebase_token();
+        String firebase_token = Singleton.getInstance().getFirebase_token();
+        Log.d(TAG, "Firebase_token "+ firebase_token);
 
-        /*mAuth.signInWithCustomToken(firebase_token)
+        mAuth.signInWithCustomToken(firebase_token)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -272,13 +334,13 @@ public class detailFragment extends Fragment {
                             //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
-                           // Log.w(TAG, "signInWithCustomToken:failure", task.getException());
+                            Log.w(TAG, "signInWithCustomToken:failure", task.getException());
                             Toast.makeText(getContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                             //updateUI(null);
                         }
                     }
-                });*/
+                });
     }
 
 }

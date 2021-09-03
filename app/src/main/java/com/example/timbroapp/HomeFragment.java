@@ -2,8 +2,12 @@ package com.example.timbroapp;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,6 +18,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
 import static android.widget.AdapterView.*;
 
 /**
@@ -27,6 +32,8 @@ public class HomeFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private List<Stamping> stampings;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -63,6 +70,46 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        String id_user = Singleton.getInstance().getId_user();
+        TimbriViewModel model = new ViewModelProvider(this).get(TimbriViewModel.class);
+
+        model.stampings.observe(getViewLifecycleOwner(), stampings -> {
+            // update UI
+            String[] items = new String[stampings.toArray().length];
+            for(int i=0; i<stampings.toArray().length; i++) {
+                items[i] = stampings.get(i).getTitle();
+            }
+
+            listView = (ListView)view.findViewById(R.id.listview);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items);
+            listView.setAdapter(arrayAdapter);
+
+            // View Item Click
+            listView.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    detailFragment detailFragment = new detailFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("item", i);
+                    detailFragment.setArguments(bundle);
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
+                }
+            });
+        });
+
+        model.onError.observe(getViewLifecycleOwner(), stampings -> {
+            // update UI
+            Log.d(TAG, "Error on retrieving stampings");
+        });
+
+        model.loadStampings(id_user);
+
+    }
+
     ListView listView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +118,7 @@ public class HomeFragment extends Fragment {
         List<Stamping> stampings = Singleton.getInstance().getStampings();
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        String[] items = new String[stampings.toArray().length];
+        /*String[] items = new String[stampings.toArray().length];
 
         for(int i=0; i<stampings.toArray().length; i++) {
             items[i] = stampings.get(i).getTitle();
@@ -91,7 +138,7 @@ public class HomeFragment extends Fragment {
                 detailFragment.setArguments(bundle);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
             }
-        });
+        });*/
 
         // Inflate the layout for this fragment
         return view;
