@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +34,7 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private List<Stamping> stampings;
+    private SwipeRefreshLayout pullToRefresh;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -75,9 +77,11 @@ public class HomeFragment extends Fragment {
 
         String id_user = Singleton.getInstance().getId_user();
         TimbriViewModel model = new ViewModelProvider(this).get(TimbriViewModel.class);
+        pullToRefresh = view.findViewById(R.id.pullToRefresh);
 
         model.stampings.observe(getViewLifecycleOwner(), stampings -> {
             // update UI
+            pullToRefresh.setRefreshing(false);
             String[] items = new String[stampings.toArray().length];
             for(int i=0; i<stampings.toArray().length; i++) {
                 items[i] = stampings.get(i).getTitle();
@@ -104,6 +108,13 @@ public class HomeFragment extends Fragment {
         model.onError.observe(getViewLifecycleOwner(), stampings -> {
             // update UI
             Log.d(TAG, "Error on retrieving stampings");
+        });
+
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                model.loadStampings(id_user); // your code
+            }
         });
 
         model.loadStampings(id_user);
