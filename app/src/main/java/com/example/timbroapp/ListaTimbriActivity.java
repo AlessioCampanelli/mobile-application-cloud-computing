@@ -39,7 +39,6 @@ public class ListaTimbriActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(navListener);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
-
     }
 
     private NavigationBarView.OnItemSelectedListener navListener =
@@ -51,9 +50,6 @@ public class ListaTimbriActivity extends AppCompatActivity {
                     switch(item.getItemId()) {
                         case R.id.home:
                             selectedFragment = new HomeFragment();
-                            break;
-                        case R.id.profile:
-                            selectedFragment = new ProfileFragment();
                             break;
                         case R.id.more:
                             selectedFragment = new MoreFragment();

@@ -44,7 +44,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.content.ContentValues.TAG;
 
@@ -53,6 +55,7 @@ import static android.content.ContentValues.TAG;
  * Use the {@link DetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
 public class DetailFragment extends Fragment {
 
     private List<Stamping> stampings;
@@ -69,8 +72,12 @@ public class DetailFragment extends Fragment {
     private TextView endTimeView;
     private TextView startStampedTimeView;
     private TextView endStampedTimeView;
+    private TextView gpsView;
 
     private LoadingDialog loadingDialog = new LoadingDialog(getActivity());
+
+    private Stamping currentStamping;
+    private StampType typeChoosed;
 
     FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -82,7 +89,7 @@ public class DetailFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private int n_timbro;
+    private int current_index_stamping;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -119,28 +126,6 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    /*@Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        Stamping stmp = stampings.get(n_timbro);
-
-        TimbriViewModel model = new ViewModelProvider(this).get(TimbriViewModel.class);
-
-        model.stampings.observe(getViewLifecycleOwner(), stampings -> {
-            // update UI
-            Log.d(TAG, "Stampings retrieved correctly!");
-        });
-
-        model.onError.observe(getViewLifecycleOwner(), stampings -> {
-            // update UI
-            Log.d(TAG, "Error on retrieving stampings");
-        });
-
-        model.loadStampings(stmp.getIdUser());
-
-    }*/
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,47 +145,22 @@ public class DetailFragment extends Fragment {
         endTimeView = (TextView) view.findViewById(R.id.textviewEndTime);
         startStampedTimeView = (TextView) view.findViewById(R.id.textviewStartStampedTime);
         endStampedTimeView = (TextView) view.findViewById(R.id.textviewEndStampedTime);
+        gpsView = (TextView) view.findViewById(R.id.textviewGps);
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             int myInt = bundle.getInt("item", 0);
-            n_timbro = myInt;
+            current_index_stamping = myInt;
         }
 
         ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.fragment_detail);
 
         firebaseAuth();
-        Stamping currentStamping = stampings.get(n_timbro);
+        currentStamping = stampings.get(current_index_stamping);
 
-        titleView.setText(currentStamping.getTitle());
-        addressView.setText(currentStamping.getAddress());
-
-
-        Date startTimeDate = new Date(Long.parseLong(currentStamping.getStartTime())*1000);
-        Date endTimeDate = new Date(Long.parseLong(currentStamping.getEndTime())*1000);
-
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-        String startTimeFormattedDate = formatter.format(startTimeDate);
-        String endTimeFormattedDate = formatter.format(endTimeDate);
-
-        if (currentStamping.getStartStampedTime() != null) {
-            Date startStampedDate = new Date(Long.parseLong(currentStamping.getStartStampedTime())*1000);
-            String startStampedFormattedDate = formatter.format(startStampedDate);
-            startStampedTimeView.setText(startStampedFormattedDate);
-        }
-
-        if (currentStamping.getEndStampedTime() != null) {
-            Date endStampedDate = new Date(Long.parseLong(currentStamping.getEndStampedTime())*1000);
-            String endStampedFormattedDate = formatter.format(endStampedDate);
-            endStampedTimeView.setText(endStampedFormattedDate);
-        }
-
-        startTimeView.setText(startTimeFormattedDate);
-        endTimeView.setText(endTimeFormattedDate);
+       updateUI();
 
         db = FirebaseFirestore.getInstance();
-        DocumentReference doc_ref = db.collection("stampings").document(currentStamping.getIdDoc());
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -208,31 +168,10 @@ public class DetailFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 loadingDialog = new LoadingDialog(getActivity());
-                loadingDialog.startLoadingDialog();
-                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
-                doc_ref
-                        .update("start_stamped_time", timestamp)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                loadingDialog.dismissDialog();
-                                Log.d(TAG, "Timbratura Check-In effettuata con successo!");
-                                Toast.makeText(getContext(), "Timbratura Check-In effettuata con successo!", Toast.LENGTH_LONG).show();
-                                model.loadStampings(Singleton.getInstance().getId_user());
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                loadingDialog.dismissDialog();
-                                Log.w(TAG, "Error updating document", e);
-                            }
-                        });
 
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    getCurrentLocation();
+                    getCurrentLocation(StampType.CHECKIN);
                 } else {
                     ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
                 }
@@ -243,29 +182,11 @@ public class DetailFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 loadingDialog = new LoadingDialog(getActivity());
-                loadingDialog.startLoadingDialog();
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                doc_ref
-                        .update("end_stamped_time", timestamp)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                loadingDialog.dismissDialog();
-                                Log.d(TAG, "DocumentSnapshot successfully updated!");
-                                Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                loadingDialog.dismissDialog();
-                                Log.w(TAG, "Error updating document", e);
-                            }
-                        });
 
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    getCurrentLocation();
+                    getCurrentLocation(StampType.CHECKOUT);
                 } else {
                     ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
                 }
@@ -306,16 +227,16 @@ public class DetailFragment extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 100 && grantResults.length > 0 && (grantResults[0] + grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
-            getCurrentLocation();
+            getCurrentLocation(typeChoosed);
         } else {
             Toast.makeText(getContext(), "Permission denied.", Toast.LENGTH_SHORT).show();
         }
     }
 
     @SuppressLint("MissingPermission")
-    private void getCurrentLocation() {
+    private void getCurrentLocation(StampType type) {
         LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-
+        this.typeChoosed = type;
         if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
@@ -323,8 +244,87 @@ public class DetailFragment extends Fragment {
                 public void onComplete(@NonNull Task<Location> task) {
                     Location location = task.getResult();
                     if (location != null) {
-                        //tvLatitude.setText(String.valueOf(location.getLatitude()));
-                        //tvLongitude.setText(String.valueOf(location.getLongitude()));
+                        gpsView.setText(String.valueOf(location.getLatitude()) + ", " + String.valueOf(location.getLongitude()));
+                        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                        DocumentReference doc_ref = db.collection("stampings").document(currentStamping.getIdDoc());
+
+                        loadingDialog.startLoadingDialog();
+                        if(type == StampType.CHECKIN) {
+                            Map<String, Object> fields = new HashMap<String, Object>();
+                            fields.put("start_stamped_time", timestamp);
+                            fields.put("latitude", location.getLatitude());
+                            fields.put("longitude", location.getLongitude());
+
+                            doc_ref
+                                    .update(fields)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    loadingDialog.dismissDialog();
+                                                }
+                                            });
+
+                                            Log.d(TAG, "Timbratura Check-In effettuata con successo!");
+                                            Toast.makeText(getContext(), "Timbratura Check-In effettuata con successo!", Toast.LENGTH_LONG).show();
+
+                                            model.stampings.observe(getViewLifecycleOwner(), stampings -> {
+                                                currentStamping = stampings.get(current_index_stamping);
+                                                updateUI();
+                                            });
+                                            model.loadStampings(Singleton.getInstance().getId_user());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    loadingDialog.dismissDialog();
+                                                }
+                                            });
+                                            Log.w(TAG, "Error updating document", e);
+                                        }
+                                    });
+                        }else if(type == StampType.CHECKOUT) {
+                            doc_ref
+                                    .update("end_stamped_time", timestamp)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    loadingDialog.dismissDialog();
+                                                }
+                                            });
+                                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                            Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
+
+                                            model.stampings.observe(getViewLifecycleOwner(), stampings -> {
+                                                currentStamping = stampings.get(current_index_stamping);
+                                                updateUI();
+                                            });
+                                            model.loadStampings(Singleton.getInstance().getId_user());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    loadingDialog.dismissDialog();
+                                                }
+                                            });
+                                            Log.w(TAG, "Error updating document", e);
+                                        }
+                                    });
+                        }
+
 
                     } else {
                         LocationRequest locationRequest = new LocationRequest()
@@ -381,4 +381,45 @@ public class DetailFragment extends Fragment {
                 });
     }
 
+    private void updateUI() {
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+                titleView.setText(currentStamping.getTitle());
+                addressView.setText(currentStamping.getAddress());
+
+                if (currentStamping.getStartTime() != null) {
+                    Date startTimeDate = new Date(Long.parseLong(currentStamping.getStartTime()) * 1000);
+                    String startTimeFormattedDate = formatter.format(startTimeDate);
+                    startTimeView.setText(startTimeFormattedDate);
+                }
+
+                if (currentStamping.getEndTime() != null) {
+                    Date endTimeDate = new Date(Long.parseLong(currentStamping.getEndTime()) * 1000);
+                    String endTimeFormattedDate = formatter.format(endTimeDate);
+                    endTimeView.setText(endTimeFormattedDate);
+                }
+
+                if (currentStamping.getStartStampedTime() != null) {
+                    Date startStampedDate = new Date(Long.parseLong(currentStamping.getStartStampedTime())*1000);
+                    String startStampedFormattedDate = formatter.format(startStampedDate);
+                    startStampedTimeView.invalidate();
+                    startStampedTimeView.setText(startStampedFormattedDate);
+                }
+
+                if (currentStamping.getEndStampedTime() != null) {
+                    Date endStampedDate = new Date(Long.parseLong(currentStamping.getEndStampedTime())*1000);
+                    String endStampedFormattedDate = formatter.format(endStampedDate);
+                    endStampedTimeView.invalidate();
+                    endStampedTimeView.setText(endStampedFormattedDate);
+                }
+
+
+
+            }
+        });
+    }
 }

@@ -40,6 +40,8 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private LoadingDialog loadingDialog;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -82,6 +84,7 @@ public class HomeFragment extends Fragment {
         model.stampings.observe(getViewLifecycleOwner(), stampings -> {
             // update UI
             pullToRefresh.setRefreshing(false);
+
             String[] items = new String[stampings.toArray().length];
             for(int i=0; i<stampings.toArray().length; i++) {
                 items[i] = stampings.get(i).getTitle();
@@ -103,22 +106,38 @@ public class HomeFragment extends Fragment {
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
                 }
             });
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadingDialog.dismissDialog();
+                }
+            });
         });
 
         model.onError.observe(getViewLifecycleOwner(), stampings -> {
             // update UI
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadingDialog.dismissDialog();
+                }
+            });
+            pullToRefresh.setRefreshing(false);
             Log.d(TAG, "Error on retrieving stampings");
         });
 
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                loadingDialog.startLoadingDialog();
                 model.loadStampings(id_user); // your code
             }
         });
 
+        loadingDialog = new LoadingDialog(getActivity());
+        // loadingDialog.startLoadingDialog();
         model.loadStampings(id_user);
-
     }
 
     ListView listView;
