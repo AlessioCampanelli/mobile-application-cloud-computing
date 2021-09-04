@@ -148,27 +148,6 @@ public class HomeFragment extends Fragment {
         List<Stamping> stampings = Singleton.getInstance().getStampings();
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        /*String[] items = new String[stampings.toArray().length];
-
-        for(int i=0; i<stampings.toArray().length; i++) {
-            items[i] = stampings.get(i).getTitle();
-        }
-
-        listView = (ListView)view.findViewById(R.id.listview);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items);
-        listView.setAdapter(arrayAdapter);
-
-        // View Item Click
-        listView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                detailFragment detailFragment = new detailFragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt("item", i);
-                detailFragment.setArguments(bundle);
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
-            }
-        });*/
 
         // Inflate the layout for this fragment
         return view;

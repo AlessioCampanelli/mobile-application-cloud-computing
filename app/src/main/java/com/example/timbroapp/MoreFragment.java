@@ -8,10 +8,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -41,7 +43,7 @@ import com.google.android.gms.tasks.Task;
  */
 public class MoreFragment extends Fragment {
 
-    Switch aSwitch;
+    SwitchCompat aSwitch;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -96,36 +98,29 @@ public class MoreFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_more, container, false);
 
-        /*btLocation = (Button) view.findViewById(R.id.bt_location);
-        tvLatitude = (TextView) view.findViewById(R.id.tv_latitude);
-        tvLongitude = (TextView) view.findViewById(R.id.tv_longitude);
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        //Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+        intent.setData(uri);
+        try {
+            startActivity(intent);
+        } catch(Exception e) {
+            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        //aSwitch = (SwitchCompat) view.findViewById(R.id.switch1);
+        //aSwitch.setText("Disable GPS");
 
-        btLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    getCurrentLocation();
-                } else {
-                    ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
-                }
-            }
-        });*/
-
-        aSwitch = (Switch) view.findViewById(R.id.switch1);
-
-        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        /*aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b == true) {
-
+                    aSwitch.setText("Disable GPS acquisition");
                 } else {
-
+                    aSwitch.setText("Enable GPS acquisition");
                 }
             }
-        });
+        });*/
 
         return view;
     }

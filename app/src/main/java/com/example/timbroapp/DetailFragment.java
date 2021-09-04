@@ -158,7 +158,7 @@ public class DetailFragment extends Fragment {
         firebaseAuth();
         currentStamping = stampings.get(current_index_stamping);
 
-       updateUI();
+        updateUI();
 
         db = FirebaseFirestore.getInstance();
 

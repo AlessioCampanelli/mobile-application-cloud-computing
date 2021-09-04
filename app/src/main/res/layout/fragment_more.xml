@@ -9,50 +9,5 @@
     android:gravity="center"
     tools:context=".MoreFragment">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/bt_location"
-        android:text="Get Location"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Latitude"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:textColor="@color/design_default_color_primary"
-        android:layout_marginTop="16dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_latitude"
-        android:text="0.0"
-        android:textSize="24sp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Longitude"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:textColor="@color/design_default_color_primary"
-        android:layout_marginTop="16dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_longitude"
-        android:text="0.0"
-        android:textSize="24sp"/>
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switch1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enable GPS"
-        android:thumb="@drawable/thumb"
-        app:track="@drawable/track"/>
 
 </LinearLayout>
