@@ -176,8 +176,8 @@ public class DetailFragment extends Fragment {
         addressView.setText(currentStamping.getAddress());
 
 
-        Date startTimeDate = new Date(Long.parseLong(currentStamping.getStartTime()));
-        Date endTimeDate = new Date(Long.parseLong(currentStamping.getEndTime()));
+        Date startTimeDate = new Date(Long.parseLong(currentStamping.getStartTime())*1000);
+        Date endTimeDate = new Date(Long.parseLong(currentStamping.getEndTime())*1000);
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
@@ -185,13 +185,13 @@ public class DetailFragment extends Fragment {
         String endTimeFormattedDate = formatter.format(endTimeDate);
 
         if (currentStamping.getStartStampedTime() != null) {
-            Date startStampedDate = new Date(Long.parseLong(currentStamping.getStartStampedTime()));
+            Date startStampedDate = new Date(Long.parseLong(currentStamping.getStartStampedTime())*1000);
             String startStampedFormattedDate = formatter.format(startStampedDate);
             startStampedTimeView.setText(startStampedFormattedDate);
         }
 
         if (currentStamping.getEndStampedTime() != null) {
-            Date endStampedDate = new Date(Long.parseLong(currentStamping.getEndStampedTime()));
+            Date endStampedDate = new Date(Long.parseLong(currentStamping.getEndStampedTime())*1000);
             String endStampedFormattedDate = formatter.format(endStampedDate);
             endStampedTimeView.setText(endStampedFormattedDate);
         }
