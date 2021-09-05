@@ -6,8 +6,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center"
     tools:context=".MoreFragment">
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enable GPS"
+        android:thumb="@drawable/thumb"
+        app:track="@drawable/track" />
+
+    <Button
+        android:id="@+id/buttonSettings"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="App Settings"
+        android:layout_gravity="center"/>
 
 
 </LinearLayout>

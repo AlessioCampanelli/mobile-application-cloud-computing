@@ -44,6 +44,7 @@ import com.google.android.gms.tasks.Task;
 public class MoreFragment extends Fragment {
 
     SwitchCompat aSwitch;
+    Button buttonSettings;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -98,30 +99,64 @@ public class MoreFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_more, container, false);
 
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        //Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
-        intent.setData(uri);
-        try {
-            startActivity(intent);
-        } catch(Exception e) {
-            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+        aSwitch = (SwitchCompat) view.findViewById(R.id.switch1);
+        buttonSettings = (Button) view.findViewById(R.id.buttonSettings);
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            aSwitch.setChecked(true);
+            aSwitch.setText("Disable sending location information");
+        } else {
+            aSwitch.setChecked(false);
+            aSwitch.setText("Enable sending location information");
         }
 
-        //aSwitch = (SwitchCompat) view.findViewById(R.id.switch1);
-        //aSwitch.setText("Disable GPS");
-
-        /*aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b == true) {
-                    aSwitch.setText("Disable GPS acquisition");
+                    aSwitch.setText("Disable sending location information");
+                    ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
                 } else {
-                    aSwitch.setText("Enable GPS acquisition");
+                    aSwitch.setText("Enable sending location information");
+                    Toast.makeText(getActivity(), "Go to app location settings to disable location acquisition", Toast.LENGTH_LONG).show();
                 }
             }
-        });*/
+        });
+
+        buttonSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+                intent.setData(uri);
+                try {
+                    startActivity(intent);
+                } catch(Exception e) {
+                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         return view;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 100 && grantResults.length > 0 && (grantResults[0] + grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
+            getCurrentLocation();
+        } else {
+            Toast.makeText(getContext(), "Permission denied.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void getCurrentLocation() {
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+        } else {
+            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
     }
 }
