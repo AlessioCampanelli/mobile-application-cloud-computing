@@ -126,7 +126,6 @@ public class MoreFragment extends Fragment {
                     editor.apply();
                 } else {
                     aSwitch.setText("Enable sending location information");
-                    Toast.makeText(getActivity(), "Go to app location settings to disable location acquisition", Toast.LENGTH_LONG).show();
                     editor.putBoolean("gpsEnabled", false);
                     editor.apply();
                 }
