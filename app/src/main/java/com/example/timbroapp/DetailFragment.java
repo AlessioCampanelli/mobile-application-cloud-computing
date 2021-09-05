@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -75,6 +76,8 @@ public class DetailFragment extends Fragment {
     private TextView startStampedTimeView;
     private TextView endStampedTimeView;
     private TextView gpsView;
+
+    private DrawView circle;
 
     private LoadingDialog loadingDialog = new LoadingDialog(getActivity());
 
@@ -148,6 +151,8 @@ public class DetailFragment extends Fragment {
         startStampedTimeView = (TextView) view.findViewById(R.id.textviewStartStampedTime);
         endStampedTimeView = (TextView) view.findViewById(R.id.textviewEndStampedTime);
         gpsView = (TextView) view.findViewById(R.id.textviewGps);
+        circle = (DrawView) view.findViewById(R.id.customView);
+
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
@@ -303,14 +308,11 @@ public class DetailFragment extends Fragment {
                             // Sign in success, update UI with the signed-in user's information
                             //Log.d(TAG, "signInWithCustomToken:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            //db = FirebaseFirestore.getInstance();
-                            //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCustomToken:failure", task.getException());
                             Toast.makeText(getContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
                         }
                     }
                 });
@@ -350,6 +352,16 @@ public class DetailFragment extends Fragment {
                     String endStampedFormattedDate = formatter.format(endStampedDate);
                     endStampedTimeView.invalidate();
                     endStampedTimeView.setText(endStampedFormattedDate);
+                }
+
+                if (currentStamping.getStartStampedTime() != null && currentStamping.getEndStampedTime() != null) {
+                    circle.colorCircle(Color.GREEN);
+                    timbroCheckIn.setEnabled(false);
+                    timbroCheckOut.setEnabled(false);
+                }
+
+                if (currentStamping.getLatitude() != null && currentStamping.getLongitude() != null) {
+                    gpsView.setText(currentStamping.getLatitude() + ", " + currentStamping.getLongitude());
                 }
             }
         });

@@ -33,6 +33,14 @@ public class Stamping {
     @Expose
     private String address;
 
+    @SerializedName("latitude")
+    @Expose
+    private Double latitude;
+
+    @SerializedName("longitude")
+    @Expose
+    private Double longitude;
+
     public String getIdDoc() {
         return idDoc;
     }
@@ -103,6 +111,22 @@ public class Stamping {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
 }
