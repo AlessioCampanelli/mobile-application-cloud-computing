@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -102,12 +103,16 @@ public class MoreFragment extends Fragment {
         aSwitch = (SwitchCompat) view.findViewById(R.id.switch1);
         buttonSettings = (Button) view.findViewById(R.id.buttonSettings);
 
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        Boolean gpsPreferencesEnabled = sharedPref.getBoolean("gpsEnabled", false);
+        aSwitch.setChecked(gpsPreferencesEnabled);
+
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            aSwitch.setChecked(true);
             aSwitch.setText("Disable sending location information");
         } else {
-            aSwitch.setChecked(false);
             aSwitch.setText("Enable sending location information");
         }
 
@@ -117,9 +122,13 @@ public class MoreFragment extends Fragment {
                 if (b == true) {
                     aSwitch.setText("Disable sending location information");
                     ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+                    editor.putBoolean("gpsEnabled", true);
+                    editor.apply();
                 } else {
                     aSwitch.setText("Enable sending location information");
                     Toast.makeText(getActivity(), "Go to app location settings to disable location acquisition", Toast.LENGTH_LONG).show();
+                    editor.putBoolean("gpsEnabled", false);
+                    editor.apply();
                 }
             }
         });
