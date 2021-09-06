@@ -32,7 +32,7 @@ public class DrawView extends View {
         paint.setColor(colorCircle);
 
         // draw circle
-        canvas.drawCircle(x - 60, 60, radius, paint);
+        canvas.drawCircle(x - 50, 50, radius, paint);
     }
 
     public void colorCircle(Integer color) {

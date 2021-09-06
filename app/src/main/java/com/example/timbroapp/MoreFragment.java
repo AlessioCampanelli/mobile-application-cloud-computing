@@ -109,12 +109,19 @@ public class MoreFragment extends Fragment {
         Boolean gpsPreferencesEnabled = sharedPref.getBoolean("gpsEnabled", false);
         aSwitch.setChecked(gpsPreferencesEnabled);
 
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if(gpsPreferencesEnabled) {
             aSwitch.setText("Disable sending location information");
         } else {
             aSwitch.setText("Enable sending location information");
         }
+
+
+        /*if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            aSwitch.setText("Disable sending location information");
+        } else {
+            aSwitch.setText("Enable sending location information");
+        }*/
 
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
