@@ -1,5 +1,7 @@
 package com.example.timbroapp;
 
+import com.example.timbroapp.model.Stamping;
+
 import java.util.List;
 
 public class Singleton  {

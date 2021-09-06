@@ -1,30 +1,17 @@
-package com.example.timbroapp;
+package com.example.timbroapp.ui.listatimbriactivity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import androidx.fragment.app.Fragment;
 
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.view.View;
-
+import com.example.timbroapp.ui.morefragment.MoreFragment;
+import com.example.timbroapp.R;
+import com.example.timbroapp.ui.homefragment.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
-
-import java.util.ArrayList;
-
-import static android.content.ContentValues.TAG;
 
 public class ListaTimbriActivity extends AppCompatActivity {
 
@@ -35,7 +22,7 @@ public class ListaTimbriActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_timbri);
 
-        bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottomNavigationView);
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(navListener);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();

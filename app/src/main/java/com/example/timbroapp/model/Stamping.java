@@ -1,4 +1,4 @@
-package com.example.timbroapp;
+package com.example.timbroapp.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -40,6 +40,10 @@ public class Stamping {
     @SerializedName("longitude")
     @Expose
     private Double longitude;
+
+    private StatusFile statusFile = StatusFile.UNKNOW;
+
+    private String filePath = null;
 
     public String getIdDoc() {
         return idDoc;
@@ -130,3 +134,4 @@ public class Stamping {
     }
 
 }
+

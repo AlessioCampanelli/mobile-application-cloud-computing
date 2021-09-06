@@ -1,4 +1,4 @@
-package com.example.timbroapp;
+package com.example.timbroapp.ui.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,16 +12,18 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.timbroapp.R;
+
 public class LoadingDialog {
 
     private Activity activity;
     private AlertDialog dialog;
 
-    LoadingDialog(Activity myActivity) {
+    public LoadingDialog(Activity myActivity) {
         activity = myActivity;
     }
 
-    void startLoadingDialog() {
+    public void startLoadingDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         LayoutInflater inflater = activity.getLayoutInflater();
@@ -32,7 +34,7 @@ public class LoadingDialog {
         dialog.show();
     }
 
-    void dismissDialog() {
+    public void dismissDialog() {
         if (dialog != null) {
             dialog.dismiss();
             dialog.hide();

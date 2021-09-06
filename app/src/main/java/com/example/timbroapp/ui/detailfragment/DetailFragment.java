@@ -1,4 +1,4 @@
-package com.example.timbroapp;
+package com.example.timbroapp.ui.detailfragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -19,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
@@ -29,6 +30,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.timbroapp.ui.view.DrawView;
+import com.example.timbroapp.ui.view.LoadingDialog;
+import com.example.timbroapp.R;
+import com.example.timbroapp.Singleton;
+import com.example.timbroapp.StampType;
+import com.example.timbroapp.model.Stamping;
+import com.example.timbroapp.ui.listatimbriactivity.TimbriViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -38,12 +46,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,9 +77,10 @@ public class DetailFragment extends Fragment {
 
     public TimbriViewModel model;
 
-    private Button timbroCheckIn;
-    private Button timbroCheckOut;
-    private Button downloadPDF;
+    private FloatingActionButton timbroCheckIn;
+    private FloatingActionButton timbroCheckOut;
+    private FloatingActionButton downloadPDF;
+    private FloatingActionButton fab;
 
     private TextView titleView;
     private TextView addressView;
@@ -89,35 +102,22 @@ public class DetailFragment extends Fragment {
     private FirebaseAuth mAuth;
     FirebaseFirestore db;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
+    private static final String ITEM = "item";
 
     private int current_index_stamping;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int index;
+    private boolean isFABOpen = false;
 
     public DetailFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment detailFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DetailFragment newInstance(String param1, String param2) {
+
+    public static DetailFragment newInstance(int index) {
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ITEM, index);
         fragment.setArguments(args);
         return fragment;
     }
@@ -126,9 +126,9 @@ public class DetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            index = getArguments().getInt(ITEM,0);
         }
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -140,9 +140,9 @@ public class DetailFragment extends Fragment {
 
         stampings = Singleton.getInstance().getStampings();
 
-        timbroCheckIn = (Button)view.findViewById(R.id.checkIn);
-        timbroCheckOut = (Button)view.findViewById(R.id.checkOut);
-        downloadPDF = (Button)view.findViewById(R.id.buttonDownload);
+        timbroCheckIn = (FloatingActionButton) view.findViewById(R.id.checkIn);
+        timbroCheckOut = (FloatingActionButton) view.findViewById(R.id.checkOut);
+        downloadPDF = (FloatingActionButton) view.findViewById(R.id.buttonDownload);
 
         titleView = (TextView) view.findViewById(R.id.textviewTitle);
         addressView = (TextView) view.findViewById(R.id.textviewAddress);
@@ -152,13 +152,19 @@ public class DetailFragment extends Fragment {
         endStampedTimeView = (TextView) view.findViewById(R.id.textviewEndStampedTime);
         gpsView = (TextView) view.findViewById(R.id.textviewGps);
         circle = (DrawView) view.findViewById(R.id.customView);
+        fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!isFABOpen){
+                    showFABMenu();
+                }else{
+                    closeFABMenu();
+                }
+            }
+        });
 
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            int myInt = bundle.getInt("item", 0);
-            current_index_stamping = myInt;
-        }
 
         ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.fragment_detail);
 
@@ -203,32 +209,32 @@ public class DetailFragment extends Fragment {
         downloadPDF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                downloadPDF();
+                try {
+                    model.getPDF(new URL("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"),  new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(),"dummy.pdf") );
+
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                }
             }
 
-            public void downloadPDF() {
-                /*viewModelScope.launch(Dispatchers.IO) {
-                    try {
-                        val devices = deviceRepo.meshDevicesSync
-
-                        val maxDevices = deviceRepo.getMaxDevicesForPlant(ignoreDeviceType = true)
-                        val app = getApplication<Application>()
-
-                        if(devices.size >= maxDevices){
-                            errorMessage.postValue(app.getString(R.string.error_max_devices_reached))
-                            return@launch
-                        }
-
-                        isDeviceToAdd.postValue(true)
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                    }
-                }*/
-            }
         });
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    private void showFABMenu(){
+        isFABOpen=true;
+        timbroCheckIn.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
+        timbroCheckOut.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
+        downloadPDF.animate().translationY(-getResources().getDimension(R.dimen.standard_155));
+    }
+
+    private void closeFABMenu(){
+        isFABOpen=false;
+        timbroCheckIn.animate().translationY(0);
+        timbroCheckOut.animate().translationY(0);
+        downloadPDF.animate().translationY(0);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.example.timbroapp;
+package com.example.timbroapp.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;

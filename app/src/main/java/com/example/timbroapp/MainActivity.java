@@ -2,7 +2,6 @@ package com.example.timbroapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Application;
 import android.content.Intent;
 import android.view.View;
 import android.widget.EditText;
@@ -11,10 +10,11 @@ import android.widget.Button;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.List;
+import com.example.timbroapp.model.Result;
+import com.example.timbroapp.network.RetrofitClient;
+import com.example.timbroapp.ui.listatimbriactivity.ListaTimbriActivity;
+import com.example.timbroapp.ui.view.LoadingDialog;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

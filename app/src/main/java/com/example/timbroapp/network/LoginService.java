@@ -1,7 +1,8 @@
-package com.example.timbroapp;
+package com.example.timbroapp.network;
 
 
-import java.util.List;
+import com.example.timbroapp.model.Result;
+import com.example.timbroapp.model.ResultStampings;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -10,7 +11,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface LoginService {

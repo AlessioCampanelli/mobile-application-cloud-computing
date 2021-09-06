@@ -7,18 +7,18 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.timbroapp.HomeFragment"
+        android:name="com.example.timbroapp.ui.homefragment.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.timbroapp.MoreFragment"
+        android:name="com.example.timbroapp.ui.morefragment.MoreFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_more" />
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.example.timbroapp.DetailFragment"
+        android:name="com.example.timbroapp.ui.detailfragment.DetailFragment"
         android:label="fragment_detail"
         tools:layout="@layout/fragment_detail" />
 </navigation>

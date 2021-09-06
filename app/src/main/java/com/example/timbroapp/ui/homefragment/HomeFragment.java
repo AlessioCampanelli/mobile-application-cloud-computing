@@ -1,4 +1,4 @@
-package com.example.timbroapp;
+package com.example.timbroapp.ui.homefragment;
 
 import android.os.Bundle;
 
@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
@@ -20,6 +21,13 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 import static android.widget.AdapterView.*;
+
+import com.example.timbroapp.ui.view.LoadingDialog;
+import com.example.timbroapp.R;
+import com.example.timbroapp.Singleton;
+import com.example.timbroapp.ui.listatimbriactivity.TimbriViewModel;
+import com.example.timbroapp.model.Stamping;
+import com.example.timbroapp.ui.detailfragment.DetailFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -81,6 +89,22 @@ public class HomeFragment extends Fragment {
         TimbriViewModel model = new ViewModelProvider(this).get(TimbriViewModel.class);
         pullToRefresh = view.findViewById(R.id.pullToRefresh);
 
+        model.loadStampings(id_user);
+
+        listView = (RecyclerView)view.findViewById(R.id.rv_timbri);
+        TimbriAdapter adapter = new TimbriAdapter(model.stampings.getValue(), new TimbriAdapter.OnClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                DetailFragment detailFragment = new DetailFragment().newInstance(position);
+                Bundle bundle = new Bundle();
+                bundle.putInt("item", position);
+                detailFragment.setArguments(bundle);
+                detailFragment.model = model;
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
+            }
+        });
+        listView.setAdapter(adapter);
+
         model.stampings.observe(getViewLifecycleOwner(), stampings -> {
             // update UI
             pullToRefresh.setRefreshing(false);
@@ -90,24 +114,13 @@ public class HomeFragment extends Fragment {
                 items[i] = stampings.get(i).getTitle();
             }
 
-            listView = (ListView)view.findViewById(R.id.listview);
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items);
-            listView.setAdapter(arrayAdapter);
+            adapter.clear();
+            adapter.addAll(stampings);
 
-            // View Item Click
-            listView.setOnItemClickListener(new OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    DetailFragment detailFragment = new DetailFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("item", i);
-                    detailFragment.setArguments(bundle);
-                    detailFragment.model = model;
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
-                }
-            });
 
-            getActivity().runOnUiThread(new Runnable() {
+
+
+            requireActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     loadingDialog.dismissDialog();
@@ -131,16 +144,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onRefresh() {
                 loadingDialog.startLoadingDialog();
-                model.loadStampings(id_user); // your code
+                model.loadStampings(id_user);
             }
         });
 
         loadingDialog = new LoadingDialog(getActivity());
         // loadingDialog.startLoadingDialog();
-        model.loadStampings(id_user);
     }
 
-    ListView listView;
+    RecyclerView listView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

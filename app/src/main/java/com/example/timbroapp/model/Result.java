@@ -1,4 +1,4 @@
-package com.example.timbroapp;
+package com.example.timbroapp.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

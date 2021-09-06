@@ -1,4 +1,4 @@
-package com.example.timbroapp;
+package com.example.timbroapp.network;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
