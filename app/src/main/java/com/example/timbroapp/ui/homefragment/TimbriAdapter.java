@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timbroapp.R;
 import com.example.timbroapp.model.Stamping;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class TimbriAdapter extends RecyclerView.Adapter<TimbriAdapter.ViewHolder> {
@@ -63,6 +65,8 @@ public class TimbriAdapter extends RecyclerView.Adapter<TimbriAdapter.ViewHolder
         TextView title = viewHolder.itemView.findViewById(R.id.timbro);
         TextView checkInDate = viewHolder.itemView.findViewById(R.id.check_in_date);
         TextView checkOutDate = viewHolder.itemView.findViewById(R.id.check_out_date);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,8 +76,14 @@ public class TimbriAdapter extends RecyclerView.Adapter<TimbriAdapter.ViewHolder
         });
 
         title.setText(localDataSet.get(position).getTitle());
-        checkInDate.setText(localDataSet.get(position).getStartTime());
-        checkOutDate.setText(localDataSet.get(position).getEndTime());
+        Date startTimeDate = new Date(Long.parseLong(localDataSet.get(position).getStartTime()) * 1000);
+        String startTimeFormattedDate = formatter.format(startTimeDate);
+
+        Date finalTimeDate = new Date(Long.parseLong(localDataSet.get(position).getEndTime()) * 1000);
+        String finalTimeFormattedDate = formatter.format(finalTimeDate);
+
+        checkInDate.setText(startTimeFormattedDate);
+        checkOutDate.setText(finalTimeFormattedDate);
 
 
     }

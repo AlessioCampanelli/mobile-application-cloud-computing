@@ -1,5 +1,7 @@
 package com.example.timbroapp.ui.detailfragment;
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,14 +13,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-
 import android.os.Environment;
 import android.os.Looper;
 import android.provider.Settings;
@@ -26,17 +20,26 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.timbroapp.ui.view.DrawView;
-import com.example.timbroapp.ui.view.LoadingDialog;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.example.timbroapp.R;
 import com.example.timbroapp.Singleton;
 import com.example.timbroapp.StampType;
 import com.example.timbroapp.model.Stamping;
 import com.example.timbroapp.ui.listatimbriactivity.TimbriViewModel;
+import com.example.timbroapp.ui.view.DrawView;
+import com.example.timbroapp.ui.view.LoadingDialog;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -55,15 +58,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -77,10 +77,16 @@ public class DetailFragment extends Fragment {
 
     public TimbriViewModel model;
 
-    private FloatingActionButton timbroCheckIn;
-    private FloatingActionButton timbroCheckOut;
-    private FloatingActionButton downloadPDF;
+    private FloatingActionButton fabCheckIn;
+    private FloatingActionButton fabCheckOut;
+    private FloatingActionButton fabDownloadPDF;
     private FloatingActionButton fab;
+    private LinearLayout llCheckIn;
+    private LinearLayout llCheckOut;
+    private LinearLayout llDownloadPDF;
+    private TextView checkInLabel;
+    private TextView checkOutLabel;
+    private TextView downloadLabel;
 
     private TextView titleView;
     private TextView addressView;
@@ -105,10 +111,11 @@ public class DetailFragment extends Fragment {
 
     private static final String ITEM = "item";
 
-    private int current_index_stamping;
+    private int indexStamping;
 
     private int index;
     private boolean isFABOpen = false;
+    private DetailFragmentViewModel detailFragmentViewModel;
 
     public DetailFragment() {
     }
@@ -126,8 +133,11 @@ public class DetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            index = getArguments().getInt(ITEM,0);
+            indexStamping = getArguments().getInt(ITEM, 0);
         }
+
+        detailFragmentViewModel = ViewModelProviders.of(requireActivity()).get(DetailFragmentViewModel.class);
+
 
     }
 
@@ -140,9 +150,16 @@ public class DetailFragment extends Fragment {
 
         stampings = Singleton.getInstance().getStampings();
 
-        timbroCheckIn = (FloatingActionButton) view.findViewById(R.id.checkIn);
-        timbroCheckOut = (FloatingActionButton) view.findViewById(R.id.checkOut);
-        downloadPDF = (FloatingActionButton) view.findViewById(R.id.buttonDownload);
+
+        fabCheckIn = (FloatingActionButton) view.findViewById(R.id.fab_checkIn);
+        fabCheckOut = (FloatingActionButton) view.findViewById(R.id.fab_checkOut);
+        fabDownloadPDF = (FloatingActionButton) view.findViewById(R.id.fab_download);
+        llCheckIn = (LinearLayout) view.findViewById(R.id.ll_fab_checkIn);
+        llCheckOut = (LinearLayout) view.findViewById(R.id.ll_fab_checkout);
+        llDownloadPDF = (LinearLayout) view.findViewById(R.id.ll_fab_download);
+        checkInLabel = (TextView) view.findViewById(R.id.fab_checkIn_label);
+        checkOutLabel = (TextView) view.findViewById(R.id.fab_checkout_label);
+        downloadLabel = (TextView) view.findViewById(R.id.fab_download_label);
 
         titleView = (TextView) view.findViewById(R.id.textviewTitle);
         addressView = (TextView) view.findViewById(R.id.textviewAddress);
@@ -157,9 +174,9 @@ public class DetailFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isFABOpen){
+                if (!isFABOpen) {
                     showFABMenu();
-                }else{
+                } else {
                     closeFABMenu();
                 }
             }
@@ -169,7 +186,7 @@ public class DetailFragment extends Fragment {
         ConstraintLayout layout = (ConstraintLayout) view.findViewById(R.id.fragment_detail);
 
         firebaseAuth();
-        currentStamping = stampings.get(current_index_stamping);
+        currentStamping = stampings.get(indexStamping);
 
         updateUI();
 
@@ -177,7 +194,7 @@ public class DetailFragment extends Fragment {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
-        timbroCheckIn.setOnClickListener(new View.OnClickListener() {
+        fabCheckIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 loadingDialog = new LoadingDialog(getActivity());
@@ -186,12 +203,12 @@ public class DetailFragment extends Fragment {
                         && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     getCurrentLocation(StampType.CHECKIN);
                 } else {
-                    ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
                 }
             }
         });
 
-        timbroCheckOut.setOnClickListener(new View.OnClickListener() {
+        fabCheckOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 loadingDialog = new LoadingDialog(getActivity());
@@ -201,20 +218,43 @@ public class DetailFragment extends Fragment {
                         && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     getCurrentLocation(StampType.CHECKOUT);
                 } else {
-                    ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
                 }
             }
         });
 
-        downloadPDF.setOnClickListener(new View.OnClickListener() {
+        fabDownloadPDF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    model.getPDF(new URL("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"),  new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(),"dummy.pdf") );
 
-                } catch (MalformedURLException e){
-                    e.printStackTrace();
+                switch (currentStamping.getStatusFile()) {
+                    case UNKNOW:
+                    case DASCARICARE: {
+
+                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), currentStamping.getFileName());
+
+                        try {
+                            detailFragmentViewModel.getPDF(file, currentStamping);
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    }
+                    case READY: {
+                        File file = new File(currentStamping.getFilePath());
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", file), "application/pdf");
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        startActivity(intent);
+                        break;
+                    }
+                    case INDOWNLOAD: {
+
+                        break;
+                    }
                 }
+
+
             }
 
         });
@@ -223,18 +263,24 @@ public class DetailFragment extends Fragment {
         return view;
     }
 
-    private void showFABMenu(){
-        isFABOpen=true;
-        timbroCheckIn.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
-        timbroCheckOut.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
-        downloadPDF.animate().translationY(-getResources().getDimension(R.dimen.standard_155));
+    private void showFABMenu() {
+        isFABOpen = true;
+        llCheckIn.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
+        llCheckOut.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
+        llDownloadPDF.animate().translationY(-getResources().getDimension(R.dimen.standard_155));
+        downloadLabel.setVisibility(View.VISIBLE);
+        checkInLabel.setVisibility(View.VISIBLE);
+        checkOutLabel.setVisibility(View.VISIBLE);
     }
 
-    private void closeFABMenu(){
-        isFABOpen=false;
-        timbroCheckIn.animate().translationY(0);
-        timbroCheckOut.animate().translationY(0);
-        downloadPDF.animate().translationY(0);
+    private void closeFABMenu() {
+        isFABOpen = false;
+        llCheckIn.animate().translationY(0);
+        llCheckOut.animate().translationY(0);
+        llDownloadPDF.animate().translationY(0);
+        downloadLabel.setVisibility(View.INVISIBLE);
+        checkInLabel.setVisibility(View.INVISIBLE);
+        checkOutLabel.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -256,13 +302,13 @@ public class DetailFragment extends Fragment {
         Boolean isLocationManagerEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        if(!isLocationManagerEnabled) {
+        if (!isLocationManagerEnabled) {
             startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             return;
         }
 
-        if(gpsPreferencesEnabled) {
+        if (gpsPreferencesEnabled) {
             fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
                 @Override
                 public void onComplete(@NonNull Task<Location> task) {
@@ -290,7 +336,7 @@ public class DetailFragment extends Fragment {
                     }
                 }
             });
-        }else{
+        } else {
             loadingDialog.startLoadingDialog();
             updateFirestoreStampings(typeChoosed, null);
         }
@@ -304,7 +350,7 @@ public class DetailFragment extends Fragment {
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         String firebase_token = Singleton.getInstance().getFirebase_token();
-        Log.d(TAG, "Firebase_token "+ firebase_token);
+        Log.d(TAG, "Firebase_token " + firebase_token);
 
         mAuth.signInWithCustomToken(firebase_token)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -331,8 +377,29 @@ public class DetailFragment extends Fragment {
             public void run() {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
+
                 titleView.setText(currentStamping.getTitle());
                 addressView.setText(currentStamping.getAddress());
+                detailFragmentViewModel.checkFileExist(currentStamping);
+
+
+                detailFragmentViewModel.statusFile.observe(getViewLifecycleOwner(), statusFIle -> {
+                    switch (statusFIle) {
+                        case READY: {
+                            downloadLabel.setText("Apri file: ");
+
+                            break;
+                        }
+                        case INDOWNLOAD: {
+
+                            break;
+                        }
+                        case DASCARICARE:
+                        case UNKNOW: {
+                            break;
+                        }
+                    }
+                });
 
                 if (currentStamping.getStartTime() != null) {
                     Date startTimeDate = new Date(Long.parseLong(currentStamping.getStartTime()) * 1000);
@@ -347,14 +414,14 @@ public class DetailFragment extends Fragment {
                 }
 
                 if (currentStamping.getStartStampedTime() != null) {
-                    Date startStampedDate = new Date(Long.parseLong(currentStamping.getStartStampedTime())*1000);
+                    Date startStampedDate = new Date(Long.parseLong(currentStamping.getStartStampedTime()) * 1000);
                     String startStampedFormattedDate = formatter.format(startStampedDate);
                     startStampedTimeView.invalidate();
                     startStampedTimeView.setText(startStampedFormattedDate);
                 }
 
                 if (currentStamping.getEndStampedTime() != null) {
-                    Date endStampedDate = new Date(Long.parseLong(currentStamping.getEndStampedTime())*1000);
+                    Date endStampedDate = new Date(Long.parseLong(currentStamping.getEndStampedTime()) * 1000);
                     String endStampedFormattedDate = formatter.format(endStampedDate);
                     endStampedTimeView.invalidate();
                     endStampedTimeView.setText(endStampedFormattedDate);
@@ -362,8 +429,8 @@ public class DetailFragment extends Fragment {
 
                 if (currentStamping.getStartStampedTime() != null && currentStamping.getEndStampedTime() != null) {
                     circle.colorCircle(Color.GREEN);
-                    timbroCheckIn.setEnabled(false);
-                    timbroCheckOut.setEnabled(false);
+                    fabCheckIn.setEnabled(false);
+                    fabCheckOut.setEnabled(false);
                 }
 
                 if (currentStamping.getLatitude() != null && currentStamping.getLongitude() != null) {
@@ -376,7 +443,7 @@ public class DetailFragment extends Fragment {
     private void updateFirestoreStampings(StampType type, @Nullable Location location) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         DocumentReference doc_ref = db.collection("stampings").document(currentStamping.getIdDoc());
-        if(type == StampType.CHECKIN) {
+        if (type == StampType.CHECKIN) {
             Map<String, Object> fields = new HashMap<String, Object>();
             fields.put("start_stamped_time", timestamp);
 
@@ -401,7 +468,7 @@ public class DetailFragment extends Fragment {
                             Toast.makeText(getContext(), "Timbratura Check-In effettuata con successo!", Toast.LENGTH_LONG).show();
 
                             model.stampings.observe(getViewLifecycleOwner(), stampings -> {
-                                currentStamping = stampings.get(current_index_stamping);
+                                currentStamping = stampings.get(indexStamping);
                                 updateUI();
                             });
                             model.loadStampings(Singleton.getInstance().getId_user());
@@ -419,7 +486,7 @@ public class DetailFragment extends Fragment {
                             Log.w(TAG, "Error updating document", e);
                         }
                     });
-        }else if(type == StampType.CHECKOUT) {
+        } else if (type == StampType.CHECKOUT) {
             doc_ref
                     .update("end_stamped_time", timestamp)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -435,7 +502,7 @@ public class DetailFragment extends Fragment {
                             Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
 
                             model.stampings.observe(getViewLifecycleOwner(), stampings -> {
-                                currentStamping = stampings.get(current_index_stamping);
+                                currentStamping = stampings.get(indexStamping);
                                 updateUI();
                             });
                             model.loadStampings(Singleton.getInstance().getId_user());

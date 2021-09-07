@@ -41,6 +41,14 @@ public class Stamping {
     @Expose
     private Double longitude;
 
+    @SerializedName("url_pdf")
+    @Expose
+    private String PDFUrl;
+
+    @SerializedName("name_pdf")
+    @Expose
+    private String fileName;
+
     private StatusFile statusFile = StatusFile.UNKNOW;
 
     private String filePath = null;
@@ -131,6 +139,38 @@ public class Stamping {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public StatusFile getStatusFile() {
+        return statusFile;
+    }
+
+    public void setStatusFile(StatusFile statusFile) {
+        this.statusFile = statusFile;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getPDFUrl() {
+        return PDFUrl;
+    }
+
+    public void setPDFUrl(String PDFUrl) {
+        this.PDFUrl = PDFUrl;
     }
 
 }

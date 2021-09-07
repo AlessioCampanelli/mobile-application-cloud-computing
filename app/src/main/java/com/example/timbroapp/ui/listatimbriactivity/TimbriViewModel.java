@@ -61,42 +61,6 @@ public class TimbriViewModel extends ViewModel {
         });
     }
 
-    public void getPDF(URL urlPDF, File path) {
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Log.i("URL:", String.valueOf(urlPDF));
-                    URLConnection connection = urlPDF.openConnection();
-                    connection.setReadTimeout(30000);
-                    connection.setConnectTimeout(30000);
-                    int filesize = connection.getContentLength();
-                    InputStream inputStream = connection.getInputStream();
-                    OutputStream outputStream = new FileOutputStream(path);
-                    byte[] buffer = new byte[2 * 1024];
-                    int length = 0;
-                    int downloadedSize = 0;
-                    while ((length = inputStream.read(buffer)) > 0) {
-
-                        outputStream.write(buffer, 0, length);
-                        downloadedSize += length;
-                        Log.i("downloaded Size", "" + downloadedSize);
-
-                        //listener.onDownloadPercentListener((downloadedSize*100)/filesize);
-
-                    }
-
-                    //listener.onDownloadCompleteListener();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        thread.start();
-    }
 
 }
 
