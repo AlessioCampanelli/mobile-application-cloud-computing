@@ -44,6 +44,7 @@
             android:id="@+id/fab_checkOut"
             android:layout_width="45dp"
             android:layout_height="45dp"
+            app:fabCustomSize="45dp"
             />
     </LinearLayout>
 
@@ -69,6 +70,7 @@
             android:id="@+id/fab_checkIn"
             android:layout_width="45dp"
             android:layout_height="45dp"
+            app:fabCustomSize="45dp"
             />
     </LinearLayout>
 
@@ -94,6 +96,7 @@
             android:id="@+id/fab_download"
             android:layout_width="45dp"
             android:layout_height="45dp"
+            app:fabCustomSize="45dp"
             android:text="Check-Out" />
     </LinearLayout>
 

@@ -148,7 +148,6 @@ public class DetailFragment extends Fragment {
                 new ActivityResultCallback<Map<String, Boolean>>() {
                     @Override
                     public void onActivityResult(Map<String, Boolean> result) {
-                        System.out.println("ciaooo");
                         saveStoragePdf();
                     }
                 });
@@ -188,6 +187,10 @@ public class DetailFragment extends Fragment {
         gpsView = (TextView) view.findViewById(R.id.textviewGps);
         circle = (DrawView) view.findViewById(R.id.customView);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
+
+        fabCheckIn.setImageResource(R.drawable.ic_baseline_check_box_24);
+        fabCheckOut.setImageResource(R.drawable.ic_baseline_library_add_check_24);
+        fab.setImageResource(R.drawable.ic_baseline_add_24);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -398,11 +401,25 @@ public class DetailFragment extends Fragment {
 
     private void updateUI() {
 
+        switch (currentStamping.getStatusFile()) {
+            case UNKNOW: {
+                fabDownloadPDF.setImageResource(R.drawable.ic_baseline_file_copy_24);
+                break;
+            }
+            case DASCARICARE: {
+                fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
+                break;
+            }
+            case READY: {
+                fabDownloadPDF.setImageResource(R.drawable.ic_baseline_file_copy_24);
+                break;
+            }
+        }
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
 
                 titleView.setText(currentStamping.getTitle());
                 addressView.setText(currentStamping.getAddress());
