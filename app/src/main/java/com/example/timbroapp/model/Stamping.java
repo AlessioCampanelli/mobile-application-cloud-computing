@@ -49,7 +49,7 @@ public class Stamping {
     @Expose
     private String fileName;
 
-    private StatusFile statusFile = StatusFile.UNKNOW;
+    private StatusFile statusFile = StatusFile.UNKNOWN;
 
     private String filePath = null;
 

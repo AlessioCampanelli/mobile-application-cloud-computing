@@ -1,11 +1,8 @@
 package com.example.timbroapp.ui.detailfragment;
 
-import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
-import androidx.core.content.FileProvider;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -15,13 +12,8 @@ import com.example.timbroapp.utility.PDFDownloaderCallback;
 import com.example.timbroapp.utility.PDFUtility;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 
 public class DetailFragmentViewModel extends ViewModel {
 
@@ -29,7 +21,7 @@ public class DetailFragmentViewModel extends ViewModel {
 
 
     public void checkFileExist(Stamping stamping) {
-        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()+"/dummy.pdf";
+        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()+"/" + stamping.getFileName();
         File file = new File(filePath);
 
         if (file.exists()) {
@@ -37,8 +29,8 @@ public class DetailFragmentViewModel extends ViewModel {
             stamping.setFilePath(filePath);
             statusFile.postValue(StatusFile.READY);
         } else {
-            stamping.setStatusFile(StatusFile.DASCARICARE);
-            statusFile.postValue(StatusFile.DASCARICARE);
+            stamping.setStatusFile(StatusFile.TO_DOWNLOAD);
+            statusFile.postValue(StatusFile.TO_DOWNLOAD);
         }
     }
 

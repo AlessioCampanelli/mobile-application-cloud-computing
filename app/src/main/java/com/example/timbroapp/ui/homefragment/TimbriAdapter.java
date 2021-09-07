@@ -27,8 +27,6 @@ public class TimbriAdapter extends RecyclerView.Adapter<TimbriAdapter.ViewHolder
             super(view);
 
         }
-
-
     }
 
     public TimbriAdapter(List<Stamping> dataSet, OnClickListener listener) {

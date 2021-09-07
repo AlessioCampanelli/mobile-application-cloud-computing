@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,7 +41,7 @@ import com.example.timbroapp.R;
 import com.example.timbroapp.Singleton;
 import com.example.timbroapp.StampType;
 import com.example.timbroapp.model.Stamping;
-import com.example.timbroapp.ui.listatimbriactivity.TimbriViewModel;
+import com.example.timbroapp.ui.homefragment.TimbriViewModel;
 import com.example.timbroapp.ui.view.DrawView;
 import com.example.timbroapp.ui.view.LoadingDialog;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -65,8 +64,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -263,8 +260,8 @@ public class DetailFragment extends Fragment {
 
     public void saveStoragePdf() {
         switch (currentStamping.getStatusFile()) {
-            case UNKNOW:
-            case DASCARICARE: {
+            case UNKNOWN:
+            case TO_DOWNLOAD: {
 
                 File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), currentStamping.getFileName());
 
@@ -283,7 +280,7 @@ public class DetailFragment extends Fragment {
                 startActivity(intent);
                 break;
             }
-            case INDOWNLOAD: {
+            case IN_DOWNLOAD: {
 
                 break;
             }
@@ -402,11 +399,11 @@ public class DetailFragment extends Fragment {
     private void updateUI() {
 
         switch (currentStamping.getStatusFile()) {
-            case UNKNOW: {
+            case UNKNOWN: {
                 fabDownloadPDF.setImageResource(R.drawable.ic_baseline_file_copy_24);
                 break;
             }
-            case DASCARICARE: {
+            case TO_DOWNLOAD: {
                 fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
                 break;
             }
@@ -433,12 +430,12 @@ public class DetailFragment extends Fragment {
 
                             break;
                         }
-                        case INDOWNLOAD: {
+                        case IN_DOWNLOAD: {
 
                             break;
                         }
-                        case DASCARICARE:
-                        case UNKNOW: {
+                        case TO_DOWNLOAD:
+                        case UNKNOWN: {
                             break;
                         }
                     }

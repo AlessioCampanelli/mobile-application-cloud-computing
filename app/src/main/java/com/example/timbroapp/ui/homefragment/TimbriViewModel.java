@@ -1,4 +1,4 @@
-package com.example.timbroapp.ui.listatimbriactivity;
+package com.example.timbroapp.ui.homefragment;
 
 import static android.content.ContentValues.TAG;
 

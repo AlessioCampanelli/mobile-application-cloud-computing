@@ -12,20 +12,15 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
-import static android.widget.AdapterView.*;
 
 import com.example.timbroapp.ui.view.LoadingDialog;
 import com.example.timbroapp.R;
 import com.example.timbroapp.Singleton;
-import com.example.timbroapp.ui.listatimbriactivity.TimbriViewModel;
 import com.example.timbroapp.model.Stamping;
 import com.example.timbroapp.ui.detailfragment.DetailFragment;
 
@@ -116,9 +111,6 @@ public class HomeFragment extends Fragment {
 
             adapter.clear();
             adapter.addAll(stampings);
-
-
-
 
             requireActivity().runOnUiThread(new Runnable() {
                 @Override

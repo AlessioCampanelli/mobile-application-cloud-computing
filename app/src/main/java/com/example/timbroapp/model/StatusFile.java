@@ -1,8 +1,8 @@
 package com.example.timbroapp.model;
 
 public enum StatusFile {
-    DASCARICARE,
-    INDOWNLOAD,
+    TO_DOWNLOAD,
+    IN_DOWNLOAD,
     READY,
-    UNKNOW
+    UNKNOWN
 }
