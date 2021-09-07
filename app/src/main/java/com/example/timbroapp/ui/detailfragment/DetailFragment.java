@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -24,11 +25,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -60,6 +65,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +120,8 @@ public class DetailFragment extends Fragment {
 
     private int indexStamping;
 
+    private ActivityResultLauncher<String[]> permissionRequest;
+
     private int index;
     private boolean isFABOpen = false;
     private DetailFragmentViewModel detailFragmentViewModel;
@@ -135,6 +144,15 @@ public class DetailFragment extends Fragment {
         if (getArguments() != null) {
             indexStamping = getArguments().getInt(ITEM, 0);
         }
+        permissionRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                new ActivityResultCallback<Map<String, Boolean>>() {
+                    @Override
+                    public void onActivityResult(Map<String, Boolean> result) {
+                        System.out.println("ciaooo");
+                        saveStoragePdf();
+                    }
+                });
+
 
         detailFragmentViewModel = ViewModelProviders.of(requireActivity()).get(DetailFragmentViewModel.class);
 
@@ -227,40 +245,46 @@ public class DetailFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                switch (currentStamping.getStatusFile()) {
-                    case UNKNOW:
-                    case DASCARICARE: {
-
-                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), currentStamping.getFileName());
-
-                        try {
-                            detailFragmentViewModel.getPDF(file, currentStamping);
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    }
-                    case READY: {
-                        File file = new File(currentStamping.getFilePath());
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setDataAndType(FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", file), "application/pdf");
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        startActivity(intent);
-                        break;
-                    }
-                    case INDOWNLOAD: {
-
-                        break;
-                    }
+                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    saveStoragePdf();
+                }else {
+                    permissionRequest.launch(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE});
                 }
-
-
             }
-
         });
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    public void saveStoragePdf() {
+        switch (currentStamping.getStatusFile()) {
+            case UNKNOW:
+            case DASCARICARE: {
+
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), currentStamping.getFileName());
+
+                try {
+                    detailFragmentViewModel.getPDF(file, currentStamping);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+            case READY: {
+                File file = new File(currentStamping.getFilePath());
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", file), "application/pdf");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(intent);
+                break;
+            }
+            case INDOWNLOAD: {
+
+                break;
+            }
+        }
     }
 
     private void showFABMenu() {
@@ -291,6 +315,8 @@ public class DetailFragment extends Fragment {
             Toast.makeText(getContext(), "Permission denied.", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
     @SuppressLint("MissingPermission")
     private void getCurrentLocation(StampType type) {
