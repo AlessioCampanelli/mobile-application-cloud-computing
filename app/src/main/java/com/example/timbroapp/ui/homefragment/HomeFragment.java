@@ -18,6 +18,7 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
+import com.example.timbroapp.ui.listatimbriactivity.ListaTimbriActivity;
 import com.example.timbroapp.ui.view.LoadingDialog;
 import com.example.timbroapp.R;
 import com.example.timbroapp.Singleton;
@@ -95,6 +96,7 @@ public class HomeFragment extends Fragment {
                 bundle.putInt("item", position);
                 detailFragment.setArguments(bundle);
                 detailFragment.model = model;
+
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, detailFragment).commit();
             }
         });

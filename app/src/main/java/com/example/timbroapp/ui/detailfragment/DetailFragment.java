@@ -37,6 +37,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.timbroapp.R;
 import com.example.timbroapp.Singleton;
 import com.example.timbroapp.StampType;
@@ -44,6 +45,7 @@ import com.example.timbroapp.model.Stamping;
 import com.example.timbroapp.ui.homefragment.TimbriViewModel;
 import com.example.timbroapp.ui.view.DrawView;
 import com.example.timbroapp.ui.view.LoadingDialog;
+import com.example.timbroapp.utility.PDFUtility;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -99,6 +101,7 @@ public class DetailFragment extends Fragment {
     private TextView startStampedTimeView;
     private TextView endStampedTimeView;
     private TextView gpsView;
+    private TextView fileView;
 
     private DrawView circle;
 
@@ -182,6 +185,7 @@ public class DetailFragment extends Fragment {
         startStampedTimeView = (TextView) view.findViewById(R.id.textviewStartStampedTime);
         endStampedTimeView = (TextView) view.findViewById(R.id.textviewEndStampedTime);
         gpsView = (TextView) view.findViewById(R.id.textviewGps);
+        fileView = (TextView) view.findViewById(R.id.textviewFile);
         circle = (DrawView) view.findViewById(R.id.customView);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
@@ -190,8 +194,11 @@ public class DetailFragment extends Fragment {
         fab.setImageResource(R.drawable.ic_baseline_add_24);
 
         fab.setOnClickListener(new View.OnClickListener() {
+            boolean isAnimated=false;
+
             @Override
             public void onClick(View view) {
+
                 if (!isFABOpen) {
                     showFABMenu();
                 } else {
@@ -262,22 +269,31 @@ public class DetailFragment extends Fragment {
         switch (currentStamping.getStatusFile()) {
             case UNKNOWN:
             case TO_DOWNLOAD: {
+                if(currentStamping.getFileName() != null) {
+                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), currentStamping.getFileName());
 
-                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), currentStamping.getFileName());
-
-                try {
-                    detailFragmentViewModel.getPDF(file, currentStamping);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                    try {
+                        detailFragmentViewModel.getPDF(file, currentStamping);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getContext(),"File doesn't exist",Toast.LENGTH_SHORT).show();
                 }
+
                 break;
             }
             case READY: {
-                File file = new File(currentStamping.getFilePath());
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".provider", file), "application/pdf");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(intent);
+                File file = null;
+                if(currentStamping.getFilePath() != null) {
+                    file = new File(currentStamping.getFilePath());
+                } else {
+                    file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), currentStamping.getFileName());
+                    Toast.makeText(getContext(),"FilePath null", Toast.LENGTH_SHORT).show();
+                }
+                PDFUtility pdfUtility = new PDFUtility();
+                pdfUtility.openPDF(getContext(),file);
+
                 break;
             }
             case IN_DOWNLOAD: {
@@ -405,6 +421,7 @@ public class DetailFragment extends Fragment {
 
                 titleView.setText(currentStamping.getTitle());
                 addressView.setText(currentStamping.getAddress());
+                fileView.setText(currentStamping.getFileName());
                 detailFragmentViewModel.checkFileExist(currentStamping);
 
 

@@ -1,6 +1,12 @@
 package com.example.timbroapp.utility;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,7 +18,7 @@ import java.net.URLConnection;
 
 public class PDFUtility {
 
-    public void getPDF(URL urlPDF, File path, PDFDownloaderCallback listener) {
+    public void getPDF(URL urlPDF, File file, PDFDownloaderCallback listener) {
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -25,7 +31,7 @@ public class PDFUtility {
                     connection.setConnectTimeout(30000);
                     int filesize = connection.getContentLength();
                     InputStream inputStream = connection.getInputStream();
-                    OutputStream outputStream = new FileOutputStream(path);
+                    OutputStream outputStream = new FileOutputStream(file);
                     byte[] buffer = new byte[2 * 1024];
                     int length = 0;
                     int downloadedSize = 0;
@@ -39,7 +45,7 @@ public class PDFUtility {
 
                     }
 
-                    listener.onFinish(path.getAbsolutePath());
+                    listener.onFinish(file.getAbsolutePath());
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -49,6 +55,30 @@ public class PDFUtility {
         });
 
         thread.start();
+    }
+
+    public void openPDF(Context context, File file) {
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+            Uri uri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".provider", file);
+            intent.setDataAndType(uri, "application/pdf");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        } else {
+            intent.setDataAndType(Uri.parse(file.getPath()), "application/pdf");
+        }
+
+        try {
+            context.startActivity(intent);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            //attemptInstallViewer();
+        }
     }
 
 }

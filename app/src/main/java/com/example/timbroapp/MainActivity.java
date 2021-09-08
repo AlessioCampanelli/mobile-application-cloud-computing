@@ -14,6 +14,7 @@ import com.example.timbroapp.model.Result;
 import com.example.timbroapp.network.RetrofitClient;
 import com.example.timbroapp.ui.listatimbriactivity.ListaTimbriActivity;
 import com.example.timbroapp.ui.view.LoadingDialog;
+import com.google.android.material.textfield.TextInputEditText;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -21,12 +22,15 @@ import retrofit2.Response;
 
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText Name;
-    private EditText Password;
+
     private Button Login;
+    private TextInputEditText textInputEditTextName;
+    private TextInputEditText textInputEditTextPassword;
 
     String jwt_token;
     String firebase_token;
@@ -39,15 +43,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Name = (EditText)findViewById(R.id.etName);
-        Password = (EditText)findViewById(R.id.etPassword);
         Login = (Button)findViewById(R.id.btnLogin);
+        textInputEditTextName= findViewById(R.id.edit_text_name);
+        textInputEditTextPassword = findViewById(R.id.edit_text_password);
+
+        textInputEditTextName.setText("admin@maacStampings.it");
 
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 loadingDialog.startLoadingDialog();
-                validate(Name.getText().toString(), Password.getText().toString());
+
+                validate(Objects.requireNonNull(textInputEditTextName.getText()).toString(), textInputEditTextPassword.getText().toString());
             }
         });
     }

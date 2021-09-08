@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="50dp">
+    android:backgroundTint="@android:color/transparent"
+    >
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         app:lottie_url="https://assets4.lottiefiles.com/packages/lf20_B8Ij6m.json"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
