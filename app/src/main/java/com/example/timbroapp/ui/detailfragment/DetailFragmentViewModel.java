@@ -21,17 +21,23 @@ public class DetailFragmentViewModel extends ViewModel {
 
 
     public void checkFileExist(Stamping stamping) {
-        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()+"/" + stamping.getFileName();
-        File file = new File(filePath);
+        if (stamping.getFileName() != null) {
+            String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()+"/" + stamping.getFileName();
+            File file = new File(filePath);
 
-        if (file.exists()) {
-            stamping.setStatusFile(StatusFile.READY);
-            stamping.setFilePath(filePath);
-            statusFile.postValue(StatusFile.READY);
+            if (file.exists()) {
+                stamping.setStatusFile(StatusFile.READY);
+                stamping.setFilePath(filePath);
+                statusFile.postValue(StatusFile.READY);
+            } else {
+                stamping.setStatusFile(StatusFile.TO_DOWNLOAD);
+                statusFile.postValue(StatusFile.TO_DOWNLOAD);
+            }
         } else {
-            stamping.setStatusFile(StatusFile.TO_DOWNLOAD);
-            statusFile.postValue(StatusFile.TO_DOWNLOAD);
+            stamping.setStatusFile(StatusFile.NOT_EXIST);
+            statusFile.postValue(StatusFile.NOT_EXIST);
         }
+
     }
 
     public void getPDF(File file, Stamping stamping) throws MalformedURLException {

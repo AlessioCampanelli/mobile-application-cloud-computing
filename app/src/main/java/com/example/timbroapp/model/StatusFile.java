@@ -4,5 +4,6 @@ public enum StatusFile {
     TO_DOWNLOAD,
     IN_DOWNLOAD,
     READY,
+    NOT_EXIST,
     UNKNOWN
 }

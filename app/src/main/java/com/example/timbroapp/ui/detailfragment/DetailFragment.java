@@ -428,20 +428,28 @@ public class DetailFragment extends Fragment {
                 detailFragmentViewModel.statusFile.observe(getViewLifecycleOwner(), statusFIle -> {
                     switch (statusFIle) {
                         case READY: {
-                            downloadLabel.setText("Apri file: ");
+                            downloadLabel.setText("Open file: ");
+                            fabDownloadPDF.setEnabled(true);
                             fabDownloadPDF.setImageResource(R.drawable.ic_baseline_file_copy_24);
                             break;
                         }
                         case IN_DOWNLOAD: {
+                            downloadLabel.setText("Download... ");
+                            fabDownloadPDF.setEnabled(true);
                             fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
                             break;
                         }
-                        case TO_DOWNLOAD:{
-                            fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
-                            break;
-                        }
+                        case TO_DOWNLOAD:
                         case UNKNOWN: {
+                            downloadLabel.setText("Download file: ");
+                            fabDownloadPDF.setEnabled(true);
                             fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
+                            break;
+                        }
+                        case NOT_EXIST:{
+                            downloadLabel.setText("file doesn't exist ");
+                            fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
+                            fabDownloadPDF.setEnabled(false);
                             break;
                         }
                     }

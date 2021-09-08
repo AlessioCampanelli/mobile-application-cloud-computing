@@ -42,8 +42,9 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_checkOut"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:elevation="0dp"
             app:fabCustomSize="45dp"
             />
     </LinearLayout>
@@ -52,8 +53,10 @@
         android:id="@+id/ll_fab_checkIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:layout_margin="22dp"
         android:gravity="center"
+        android:foregroundGravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -68,8 +71,9 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_checkIn"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:elevation="0dp"
             app:fabCustomSize="45dp"
             />
     </LinearLayout>
@@ -94,10 +98,11 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_download"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:elevation="0dp"
             app:fabCustomSize="45dp"
-            android:text="Check-Out" />
+            />
     </LinearLayout>
 
 
