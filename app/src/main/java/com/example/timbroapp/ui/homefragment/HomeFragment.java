@@ -138,8 +138,10 @@ public class HomeFragment extends Fragment {
         });
 
         model.onExpiredSession.observe(getViewLifecycleOwner(), errorMessage -> {
-            Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
             Intent intent = new Intent(getActivity(), MainActivity.class);
+            Bundle b = new Bundle();
+            b.putString("expirationMessage", errorMessage); //Your id
+            intent.putExtras(b); //Put your id to your next Intent
             startActivity(intent);
         });
 

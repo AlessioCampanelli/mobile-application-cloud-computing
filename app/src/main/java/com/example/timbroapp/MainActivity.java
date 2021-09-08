@@ -43,6 +43,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (getIntent().getExtras() != null) {
+            String expirationMessage = getIntent().getExtras().getString("expirationMessage");
+            if (expirationMessage != null) {
+                Toast.makeText(MainActivity.this, expirationMessage, Toast.LENGTH_LONG).show();
+            }
+        }
+
         Login = (Button)findViewById(R.id.btnLogin);
         textInputEditTextName= findViewById(R.id.edit_text_name);
         textInputEditTextPassword = findViewById(R.id.edit_text_password);
