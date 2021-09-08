@@ -24,7 +24,9 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.timbroapp.MainActivity;
 import com.example.timbroapp.R;
+import com.example.timbroapp.ui.listatimbriactivity.ListaTimbriActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 /**
@@ -36,6 +38,7 @@ public class MoreFragment extends Fragment {
 
     SwitchCompat aSwitch;
     Button buttonSettings;
+    Button buttonLogout;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -92,6 +95,7 @@ public class MoreFragment extends Fragment {
 
         aSwitch = (SwitchCompat) view.findViewById(R.id.switch1);
         buttonSettings = (Button) view.findViewById(R.id.buttonSettings);
+        buttonLogout = (Button) view.findViewById(R.id.buttonLogout);
 
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -140,6 +144,14 @@ public class MoreFragment extends Fragment {
                 } catch(Exception e) {
                     Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+
+        buttonLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
             }
         });
 

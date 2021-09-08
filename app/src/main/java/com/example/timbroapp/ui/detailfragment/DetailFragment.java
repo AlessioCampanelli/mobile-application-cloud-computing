@@ -398,21 +398,6 @@ public class DetailFragment extends Fragment {
 
     private void updateUI() {
 
-        switch (currentStamping.getStatusFile()) {
-            case UNKNOWN: {
-                fabDownloadPDF.setImageResource(R.drawable.ic_baseline_file_copy_24);
-                break;
-            }
-            case TO_DOWNLOAD: {
-                fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
-                break;
-            }
-            case READY: {
-                fabDownloadPDF.setImageResource(R.drawable.ic_baseline_file_copy_24);
-                break;
-            }
-        }
-
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -427,15 +412,19 @@ public class DetailFragment extends Fragment {
                     switch (statusFIle) {
                         case READY: {
                             downloadLabel.setText("Apri file: ");
-
+                            fabDownloadPDF.setImageResource(R.drawable.ic_baseline_file_copy_24);
                             break;
                         }
                         case IN_DOWNLOAD: {
-
+                            fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
                             break;
                         }
-                        case TO_DOWNLOAD:
+                        case TO_DOWNLOAD:{
+                            fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
+                            break;
+                        }
                         case UNKNOWN: {
+                            fabDownloadPDF.setImageResource(R.drawable.ic_baseline_arrow_downward_24);
                             break;
                         }
                     }
