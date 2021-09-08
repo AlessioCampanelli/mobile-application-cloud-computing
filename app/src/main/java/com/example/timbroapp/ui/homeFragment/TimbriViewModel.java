@@ -1,14 +1,12 @@
-package com.example.timbroapp.ui.homefragment;
+package com.example.timbroapp.ui.homeFragment;
 
 import static android.content.ContentValues.TAG;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.timbroapp.MainActivity;
 import com.example.timbroapp.Singleton;
 import com.example.timbroapp.model.ResultStampings;
 import com.example.timbroapp.model.Stamping;
@@ -16,13 +14,6 @@ import com.example.timbroapp.network.RetrofitClient;
 
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 
 import retrofit2.Call;

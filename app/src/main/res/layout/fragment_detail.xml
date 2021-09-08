@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:orientation="horizontal"
-    tools:context=".ui.detailfragment.DetailFragment">
+    tools:context=".ui.detailFragment.DetailFragment">
 
     <!-- TODO: Update blank fragment layout -->
 

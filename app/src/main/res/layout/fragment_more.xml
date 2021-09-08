@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".ui.morefragment.MoreFragment">
+    tools:context=".ui.moreFragment.MoreFragment">
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch1"

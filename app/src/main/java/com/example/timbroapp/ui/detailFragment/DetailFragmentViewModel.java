@@ -1,4 +1,4 @@
-package com.example.timbroapp.ui.detailfragment;
+package com.example.timbroapp.ui.detailFragment;
 
 import android.os.Environment;
 import android.util.Log;

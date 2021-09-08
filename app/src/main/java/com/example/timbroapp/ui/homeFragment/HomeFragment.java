@@ -1,4 +1,4 @@
-package com.example.timbroapp.ui.homefragment;
+package com.example.timbroapp.ui.homeFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,19 +14,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
 import com.example.timbroapp.MainActivity;
-import com.example.timbroapp.ui.listatimbriactivity.ListaTimbriActivity;
 import com.example.timbroapp.ui.view.LoadingDialog;
 import com.example.timbroapp.R;
 import com.example.timbroapp.Singleton;
 import com.example.timbroapp.model.Stamping;
-import com.example.timbroapp.ui.detailfragment.DetailFragment;
+import com.example.timbroapp.ui.detailFragment.DetailFragment;
 
 /**
  * A simple {@link Fragment} subclass.

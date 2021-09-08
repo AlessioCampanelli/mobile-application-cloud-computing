@@ -1,4 +1,4 @@
-package com.example.timbroapp.ui.detailfragment;
+package com.example.timbroapp.ui.detailFragment;
 
 import static android.content.ContentValues.TAG;
 
@@ -33,7 +33,6 @@ import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -43,7 +42,7 @@ import com.example.timbroapp.R;
 import com.example.timbroapp.Singleton;
 import com.example.timbroapp.StampType;
 import com.example.timbroapp.model.Stamping;
-import com.example.timbroapp.ui.homefragment.TimbriViewModel;
+import com.example.timbroapp.ui.homeFragment.TimbriViewModel;
 import com.example.timbroapp.ui.view.DrawView;
 import com.example.timbroapp.ui.view.LoadingDialog;
 import com.example.timbroapp.utility.PDFUtility;
@@ -522,11 +521,9 @@ public class DetailFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     loadingDialog.dismissDialog();
+                                    Toast.makeText(getContext(), "Timbratura Check-In effettuata con successo!", Toast.LENGTH_LONG).show();
                                 }
                             });
-
-                            Log.d(TAG, "Timbratura Check-In effettuata con successo!");
-                            Toast.makeText(getContext(), "Timbratura Check-In effettuata con successo!", Toast.LENGTH_LONG).show();
 
                             model.stampings.observe(getViewLifecycleOwner(), stampings -> {
                                 currentStamping = stampings.get(indexStamping);
@@ -542,6 +539,7 @@ public class DetailFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     loadingDialog.dismissDialog();
+                                    Toast.makeText(getContext(), "Ops! qualcosa è andato storto nel Check-In", Toast.LENGTH_LONG).show();
                                 }
                             });
                             Log.w(TAG, "Error updating document", e);
@@ -557,10 +555,9 @@ public class DetailFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     loadingDialog.dismissDialog();
+                                    Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
                                 }
                             });
-                            Log.d(TAG, "DocumentSnapshot successfully updated!");
-                            Toast.makeText(getContext(), "Timbratura Check-Out effettuata con successo!", Toast.LENGTH_LONG).show();
 
                             model.stampings.observe(getViewLifecycleOwner(), stampings -> {
                                 currentStamping = stampings.get(indexStamping);
@@ -576,6 +573,7 @@ public class DetailFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     loadingDialog.dismissDialog();
+                                    Toast.makeText(getContext(), "Ops! qualcosa è andato storto nel Check-out", Toast.LENGTH_LONG).show();
                                 }
                             });
                             Log.w(TAG, "Error updating document", e);

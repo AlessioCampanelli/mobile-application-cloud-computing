@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Button;
 
 import android.os.Bundle;
@@ -12,7 +11,7 @@ import android.widget.Toast;
 
 import com.example.timbroapp.model.Result;
 import com.example.timbroapp.network.RetrofitClient;
-import com.example.timbroapp.ui.listatimbriactivity.ListaTimbriActivity;
+import com.example.timbroapp.ui.listStampingsActivity.ListaTimbriActivity;
 import com.example.timbroapp.ui.view.LoadingDialog;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -41,12 +40,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
         if (getIntent().getExtras() != null) {
             String expirationMessage = getIntent().getExtras().getString("expirationMessage");
             if (expirationMessage != null) {
-                Toast.makeText(MainActivity.this, expirationMessage, Toast.LENGTH_LONG).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, expirationMessage, Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         }
 
@@ -81,9 +85,13 @@ public class MainActivity extends AppCompatActivity {
                         id_user = response.body().getId_user();
                         Singleton.getInstance().setId_user(id_user);
                         loadingDialog.dismissDialog();
-                        Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_LONG).show();
 
-                        //Call<ResultStampings> call_stampings = RetrofitClient.getInstance().getLoginService().list_stampings(id_user, "Bearer "+jwt_token);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_LONG).show();
+                            }
+                        });
 
                         // go to next activity
                         Intent intent = new Intent(MainActivity.this, ListaTimbriActivity.class);
@@ -102,9 +110,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Result> call, Throwable t) {
                     loadingDialog.dismissDialog();
-                    Toast.makeText(MainActivity.this, "Error in executing login", Toast.LENGTH_LONG).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Error in executing login", Toast.LENGTH_LONG).show();
+                        }
+                    });
             }
         });
-
     }
 }

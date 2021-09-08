@@ -1,4 +1,4 @@
-package com.example.timbroapp.ui.homefragment;
+package com.example.timbroapp.ui.homeFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +12,6 @@ import com.example.timbroapp.model.Stamping;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 

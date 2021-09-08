@@ -1,7 +1,6 @@
-package com.example.timbroapp.ui.listatimbriactivity;
+package com.example.timbroapp.ui.listStampingsActivity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,14 +9,11 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.timbroapp.ui.detailfragment.DetailFragment;
-import com.example.timbroapp.ui.morefragment.MoreFragment;
+import com.example.timbroapp.ui.detailFragment.DetailFragment;
+import com.example.timbroapp.ui.moreFragment.MoreFragment;
 import com.example.timbroapp.R;
-import com.example.timbroapp.ui.homefragment.HomeFragment;
+import com.example.timbroapp.ui.homeFragment.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -29,7 +25,7 @@ public class ListaTimbriActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lista_timbri);
+        setContentView(R.layout.activity_list_stampings);
 
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);

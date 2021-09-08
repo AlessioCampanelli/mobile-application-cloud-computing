@@ -1,4 +1,4 @@
-package com.example.timbroapp.ui.morefragment;
+package com.example.timbroapp.ui.moreFragment;
 
 import android.Manifest;
 import android.content.Context;
@@ -26,7 +26,6 @@ import android.widget.Toast;
 
 import com.example.timbroapp.MainActivity;
 import com.example.timbroapp.R;
-import com.example.timbroapp.ui.listatimbriactivity.ListaTimbriActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 /**
