@@ -3,10 +3,12 @@ package com.example.timbroapp.ui.homefragment;
 import static android.content.ContentValues.TAG;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.timbroapp.MainActivity;
 import com.example.timbroapp.Singleton;
 import com.example.timbroapp.model.ResultStampings;
 import com.example.timbroapp.model.Stamping;
@@ -30,6 +32,7 @@ import retrofit2.Response;
 public class TimbriViewModel extends ViewModel {
     public MutableLiveData<List<Stamping>> stampings = new MutableLiveData<>();
     public MutableLiveData<String> onError = new MutableLiveData<>();
+    public MutableLiveData<String> onExpiredSession = new MutableLiveData<>();
 
     public void loadStampings(String id_user) {
         // Do an asynchronous operation to fetch users.
@@ -40,6 +43,12 @@ public class TimbriViewModel extends ViewModel {
         call_stampings.enqueue(new Callback<ResultStampings>() {
             @Override
             public void onResponse(Call<ResultStampings> call, Response<ResultStampings> response) {
+
+                if(response.code() == 401) {
+                    onExpiredSession.postValue("Sessione scaduta");
+                    return;
+                }
+
                 if (response.isSuccessful()) {
                     Singleton.getInstance().setStampings(response.body().getStampings());
                     stampings.postValue(response.body().getStampings());

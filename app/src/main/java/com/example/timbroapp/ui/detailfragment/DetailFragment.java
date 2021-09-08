@@ -38,6 +38,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.timbroapp.MainActivity;
 import com.example.timbroapp.R;
 import com.example.timbroapp.Singleton;
 import com.example.timbroapp.StampType;
@@ -167,7 +168,6 @@ public class DetailFragment extends Fragment {
 
         stampings = Singleton.getInstance().getStampings();
 
-
         fabCheckIn = (FloatingActionButton) view.findViewById(R.id.fab_checkIn);
         fabCheckOut = (FloatingActionButton) view.findViewById(R.id.fab_checkOut);
         fabDownloadPDF = (FloatingActionButton) view.findViewById(R.id.fab_download);
@@ -192,6 +192,12 @@ public class DetailFragment extends Fragment {
         fabCheckIn.setImageResource(R.drawable.ic_baseline_check_box_24);
         fabCheckOut.setImageResource(R.drawable.ic_baseline_library_add_check_24);
         fab.setImageResource(R.drawable.ic_baseline_add_24);
+
+        model.onExpiredSession.observe(getViewLifecycleOwner(), errorMessage -> {
+            Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            startActivity(intent);
+        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             boolean isAnimated=false;
@@ -340,7 +346,7 @@ public class DetailFragment extends Fragment {
         this.typeChoosed = type;
 
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        Boolean gpsPreferencesEnabled = sharedPref.getBoolean("gpsEnabled", false);
+        Boolean gpsPreferencesEnabled = sharedPref.getBoolean("gpsEnabled", true);
         Boolean isLocationManagerEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
@@ -481,10 +487,11 @@ public class DetailFragment extends Fragment {
                     endStampedTimeView.setText(endStampedFormattedDate);
                 }
 
+                fabCheckIn.setEnabled(currentStamping.getStartStampedTime() == null);
+                fabCheckOut.setEnabled(currentStamping.getEndStampedTime() == null);
+
                 if (currentStamping.getStartStampedTime() != null && currentStamping.getEndStampedTime() != null) {
                     circle.colorCircle(Color.GREEN);
-                    fabCheckIn.setEnabled(false);
-                    fabCheckOut.setEnabled(false);
                 }
 
                 if (currentStamping.getLatitude() != null && currentStamping.getLongitude() != null) {

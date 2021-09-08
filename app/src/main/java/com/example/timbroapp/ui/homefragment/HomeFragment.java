@@ -1,5 +1,6 @@
 package com.example.timbroapp.ui.homefragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,11 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
+import com.example.timbroapp.MainActivity;
 import com.example.timbroapp.ui.listatimbriactivity.ListaTimbriActivity;
 import com.example.timbroapp.ui.view.LoadingDialog;
 import com.example.timbroapp.R;
@@ -132,6 +135,12 @@ public class HomeFragment extends Fragment {
             });
             pullToRefresh.setRefreshing(false);
             Log.d(TAG, "Error on retrieving stampings");
+        });
+
+        model.onExpiredSession.observe(getViewLifecycleOwner(), errorMessage -> {
+            Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            startActivity(intent);
         });
 
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
